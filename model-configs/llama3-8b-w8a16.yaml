@@ -1,0 +1,30 @@
+model_name: "llama3-8b"
+hf_model_id: "meta-llama/Llama-3.1-8B-Instruct"
+
+# Quantization
+quantization_scheme: "W8A16"
+recipe: "GPTQModifier"
+calibration_dataset: "wikitext"
+calibration_dataset_config: "wikitext-2-raw-v1"
+num_calibration_samples: 256
+max_seq_length: 4096
+
+# Evaluation benchmarks (must be valid lm_eval task names)
+benchmarks:
+  - "hellaswag"
+  - "mmlu"
+  - "arc_challenge"
+  - "gsm8k"
+  - "truthfulqa_mc2"
+
+# Soft gate thresholds (accuracy values).
+# If a benchmark falls below its threshold, a quality warning is raised.
+# The pipeline continues regardless — these are advisory, not blocking.
+thresholds:
+  hellaswag: 0.4
+  mmlu: 0.35
+  arc_challenge: 0.30
+  truthfulqa_mc2: 0.35
+
+# vLLM serving arguments (passed through to the serving startup script)
+vllm_args: "--max-model-len 4096 --enable-prefix-caching"
