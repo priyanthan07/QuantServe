@@ -1,0 +1,34 @@
+FROM nvidia/cuda:12.4.1-devel-ubuntu22.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+# system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        python3.11 python3.11-venv python3-pip \
+        git curl apt-transport-https ca-certificates gnupg && \
+    update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.11 1 && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Google Cloud SDK
+RUN curl -faSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add - && \
+    echo "deb https://packages.cloud.google.com/apt cloud-sdk main" > /etc/apt/sources.list.d/google-cloud-sdk.list && \
+    apt-get update && \
+    apt-get install -y --no-install-recommends google-cloud-cli && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Python dependencies for the full pipeline
+RUN pip install --no-cache-dir --break-system-packages \
+    torch \
+    transformers \
+    huggingface_hub \
+    llmcompressor \
+    lm_eval \
+    vllm \
+    guidellm \
+    google-cloud-storage \
+    google-cloud-secret-manager \
+    pyyaml
+
+# Copy pipeline scripts
+COPY scripts/ /opt/quantserve/scripts/
+WORKDIR /opt/quantserve

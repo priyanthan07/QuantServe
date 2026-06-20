@@ -1,0 +1,42 @@
+# Prometheus configuration for QuantServe
+# Discovers vLLM serving instances via GCE service discovery.
+# No static target lists needed — instances are found by their network tag.
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+rule_files:
+  - "/etc/prometheus/alert_rules.yml"
+
+scrape_configs:
+  # Scrape all vLLM serving instances automatically.
+  # GCE SD discovers instances by tag, so new replicas are picked up
+  # within one scrape interval of becoming healthy.
+  - job_name: "vllm"
+    gce_sd_configs:
+      - project: "YOUR_PROJECT_ID"    # Replace with actual project ID
+        zone: "us-central1-a"          # Replace with actual zone
+        port: 8000
+        filter: '(tags.items = "vllm-serving")'
+        refresh_interval: 30s
+
+    relabel_configs:
+      # Use the VM instance name as the instance label
+      - source_labels: [__meta_gce_instance_name]
+        target_label: instance_name
+
+      # Extract model_id from instance name (quantserve-{model_id}-XXXX)
+      - source_labels: [__meta_gce_instance_name]
+        regex: "quantserve-(.+)-[a-z0-9]+"
+        target_label: model_id
+        replacement: "$1"
+
+    # vLLM serves metrics at /metrics on the same port as the API
+    metrics_path: "/metrics"
+
+  # Scrape Prometheus itself for monitoring health
+  - job_name: "prometheus"
+    static_configs:
+      - targets: ["localhost:9090"]
+      

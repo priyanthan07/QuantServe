@@ -1,0 +1,69 @@
+# Prometheus alert rules for QuantServe vLLM serving.
+# These fire based on metrics vLLM exposes natively at /metrics.
+ 
+groups:
+  - name: quantserve_vllm_alerts
+    rules:
+ 
+      # GPU KV cache is nearly full — risk of OOM and request rejection
+      - alert: HighGPUCacheUsage
+        expr: vllm:gpu_cache_usage_perc > 0.9
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "GPU cache usage above 90% on {{ $labels.instance_name }}"
+          description: >
+            GPU KV cache usage is {{ $value | humanizePercentage }}.
+            Requests may start being rejected. Consider scaling up replicas
+            or reducing max_model_len.
+
+      # Requests are waiting in the queue — system is under pressure
+      - alert: HighQueueDepth
+        expr: vllm:num_requests_waiting > 5
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Queue depth above 5 on {{ $labels.instance_name }}"
+          description: >
+            {{ $value }} requests are waiting for GPU resources.
+            Autoscaling should be adding replicas. If this persists,
+            check autoscaler configuration.
+
+      # TTFT p99 exceeds SLO
+      - alert: HighTTFT
+        expr: histogram_quantile(0.99, rate(vllm:time_to_first_token_seconds_bucket[5m])) > 3.0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "TTFT p99 above 3s on {{ $labels.instance_name }}"
+          description: >
+            Time to first token p99 is {{ $value | humanizeDuration }}.
+            Users are experiencing slow initial responses.
+
+      # Instance is not responding to health checks
+      - alert: VLLMInstanceDown
+        expr: up{job="vllm"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "vLLM instance {{ $labels.instance_name }} is down"
+          description: >
+            Prometheus cannot reach the vLLM metrics endpoint.
+            The instance may have crashed or is restarting.
+ 
+      # No requests being processed — possible silent failure
+      - alert: ZeroThroughput
+        expr: rate(vllm:generation_tokens_total[5m]) == 0 and vllm:num_requests_running > 0
+        for: 3m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Zero token throughput with active requests on {{ $labels.instance_name }}"
+          description: >
+            Requests are running but no tokens are being generated.
+            The model may be stuck.
+ 

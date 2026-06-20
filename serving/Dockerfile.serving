@@ -1,0 +1,25 @@
+FROM vllm/vllm-openai:latest
+
+# LMCache for cross-replica KV cache sharing
+RUN pip install lmcache --no-cache-dir
+
+# Google Cloud SDK for fetching model from GCS and secrets
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends apt-transport-https ca-certificates gnupg curl && \
+    curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add - && \
+    echo "deb https://packages.cloud.google.com/apt cloud-sdk main" > /etc/apt/sources.list.d/google-cloud-sdk.list && \
+    apt-get update && \
+    apt-get install -y --no-install-recommends google-cloud-cli && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+EXPOSE 8000
+
+# Entrypoint is the startup script which handles:
+# 1. Copy model from GCS to local disk
+# 2. Fetch API key from Secret Manager
+# 3. Launch vLLM
+COPY startup.sh /opt/quantserve/startup.sh
+RUN chmod +x /opt/quantserve/startup.sh
+
+ENTRYPOINT ["/opt/quantserve/startup.sh"]

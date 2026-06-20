@@ -1,0 +1,95 @@
+timeout: '7200s' # 2 hour max for large model quantization
+
+steps:
+  # Step 1: Validate model config
+  - id: 'validate-config'
+    name: 'python3.11-slim'
+    entrypoint: 'python3'
+    args:
+      - '-c'
+      - |
+        import yaml, sys
+        required_fields = [
+          'model_name', 'hf_model_id', 'quantization_scheme', 'recipe', 'calibration_dataset',
+          'num_calibration_samples', 'max_seq_length', 'benchmarks', 'thresholds'
+        ]
+        with open('${_MODEL_CONFIG}') as f:
+          config = yaml.safe_load(f)
+        missing = [f for f in required_fields if f not in config]
+        if missing:
+          print(f"Error: Missing fields in config: {missing}")
+          sys.exit(1)
+        print(f"Config valid: {config['model_name']} / {config['quantization_scheme']}")
+
+  # Step 2: Download base model (if not already in GCS)
+  - id: 'download-model'
+    name: 'gcr.io/$PROJECT_ID/quantserve-pipeline'
+    entrypoint: 'python3'
+    args:
+      - 'scripts/download_model.py'
+      - '--config'
+      - '${_MODEL_CONFIG}'
+      - '--bucket'
+      - '${_BASE_BUCKET}'
+    secretEnv: ['HF_TOKEN']
+
+  # Step 3: Quantize
+  - id: 'quantize'
+    name: 'gcr.io/$PROJECT_ID/quantserve-pipeline'
+    entrypoint: 'python3'
+    args:
+      - 'scripts/quantize_model.py'
+      - '--config'
+      - '${_MODEL_CONFIG}'
+      - '--base-bucket'
+      - '${_BASE_BUCKET}'
+      - '--quant-bucket'
+      - '${_QUANT_BUCKET}'
+  
+  # Step 4: Evaluate with lm_eval
+  - id: 'evaluate'
+    name: 'gcr.io/$PROJECT_ID/quantserve-pipeline'
+    entrypoint: 'python3'
+    args:
+      - 'scripts/evaluate_model.py'
+      - '--config'
+      - '${_MODEL_CONFIG}'
+      - '--quant-bucket'
+      - '${_QUANT_BUCKET}'
+      - '--eval-bucket'
+      - '${_EVAL_BUCKET}'
+
+  # Step 5: Benchmark with GuideLLM 
+  - id: 'benchmark'
+    name: 'gcr.io/$PROJECT_ID/quantserve-pipeline'
+    entrypoint: 'python3'
+    args:
+      - 'scripts/benchmark_model.py'
+      - '--config'
+      - '${_MODEL_CONFIG}'
+      - '--quant-bucket'
+      - '${_QUANT_BUCKET}'
+      - '--eval-bucket'
+      - '${_EVAL_BUCKET}'
+
+  # Step 6: Update model registry
+  - id: 'update-registry'
+    name: 'gcr.io/$PROJECT_ID/quantserve-pipeline'
+    entrypoint: 'python3'
+    args:
+      - 'scripts/update_registry.py'
+      - '--config'
+      - '${_MODEL_CONFIG}'
+      - '--eval-bucket'
+      - '${_EVAL_BUCKET}'
+      - '--registry-bucket'
+      - '${_REG_BUCKET}'
+  
+availableSecrets:
+  secretManager:
+    - versionName: projects/$PROJECT_ID/secrets/hf-access-token/versions/latest
+      env: 'HF_TOKEN'
+
+options:
+  machineType: 'N1_HIGHCPU_8'
+  logging: CLOUD_LOGGING_ONLY

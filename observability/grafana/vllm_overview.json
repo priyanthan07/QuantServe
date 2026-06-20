@@ -1,0 +1,155 @@
+{
+    "dashboard": {
+        "title": "QuantServe — vLLM Overview",
+        "tags": [
+            "quantserve",
+            "vllm"
+        ],
+        "timezone": "browser",
+        "refresh": "15s",
+        "panels": [
+            {
+                "title": "Requests Running (per model)",
+                "type": "timeseries",
+                "gridPos": {
+                    "h": 8,
+                    "w": 12,
+                    "x": 0,
+                    "y": 0
+                },
+                "targets": [
+                    {
+                        "expr": "vllm:num_requests_running",
+                        "legendFormat": "{{ model_id }} — {{ instance_name }}"
+                    }
+                ]
+            },
+            {
+                "title": "Requests Waiting (per model)",
+                "type": "timeseries",
+                "gridPos": {
+                    "h": 8,
+                    "w": 12,
+                    "x": 12,
+                    "y": 0
+                },
+                "targets": [
+                    {
+                        "expr": "vllm:num_requests_waiting",
+                        "legendFormat": "{{ model_id }} — {{ instance_name }}"
+                    }
+                ]
+            },
+            {
+                "title": "TTFT p50 / p95 / p99 (seconds)",
+                "type": "timeseries",
+                "gridPos": {
+                    "h": 8,
+                    "w": 12,
+                    "x": 0,
+                    "y": 8
+                },
+                "targets": [
+                    {
+                        "expr": "histogram_quantile(0.50, rate(vllm:time_to_first_token_seconds_bucket[5m]))",
+                        "legendFormat": "p50 — {{ model_id }}"
+                    },
+                    {
+                        "expr": "histogram_quantile(0.95, rate(vllm:time_to_first_token_seconds_bucket[5m]))",
+                        "legendFormat": "p95 — {{ model_id }}"
+                    },
+                    {
+                        "expr": "histogram_quantile(0.99, rate(vllm:time_to_first_token_seconds_bucket[5m]))",
+                        "legendFormat": "p99 — {{ model_id }}"
+                    }
+                ]
+            },
+            {
+                "title": "Inter-Token Latency p95 (seconds)",
+                "type": "timeseries",
+                "gridPos": {
+                    "h": 8,
+                    "w": 12,
+                    "x": 12,
+                    "y": 8
+                },
+                "targets": [
+                    {
+                        "expr": "histogram_quantile(0.95, rate(vllm:inter_token_latency_seconds_bucket[5m]))",
+                        "legendFormat": "{{ model_id }} — {{ instance_name }}"
+                    }
+                ]
+            },
+            {
+                "title": "GPU KV Cache Usage (%)",
+                "type": "gauge",
+                "gridPos": {
+                    "h": 8,
+                    "w": 8,
+                    "x": 0,
+                    "y": 16
+                },
+                "targets": [
+                    {
+                        "expr": "vllm:gpu_cache_usage_perc",
+                        "legendFormat": "{{ model_id }} — {{ instance_name }}"
+                    }
+                ],
+                "fieldConfig": {
+                    "defaults": {
+                        "min": 0,
+                        "max": 1,
+                        "thresholds": {
+                            "steps": [
+                                {
+                                    "color": "green",
+                                    "value": 0
+                                },
+                                {
+                                    "color": "yellow",
+                                    "value": 0.7
+                                },
+                                {
+                                    "color": "red",
+                                    "value": 0.9
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            {
+                "title": "Prefix Cache Hit Rate",
+                "type": "timeseries",
+                "gridPos": {
+                    "h": 8,
+                    "w": 8,
+                    "x": 8,
+                    "y": 16
+                },
+                "targets": [
+                    {
+                        "expr": "rate(vllm:prefix_cache_hit_total[5m]) / (rate(vllm:prefix_cache_hit_total[5m]) + rate(vllm:prefix_cache_miss_total[5m]))",
+                        "legendFormat": "{{ model_id }}"
+                    }
+                ]
+            },
+            {
+                "title": "Token Throughput (tokens/sec)",
+                "type": "timeseries",
+                "gridPos": {
+                    "h": 8,
+                    "w": 8,
+                    "x": 16,
+                    "y": 16
+                },
+                "targets": [
+                    {
+                        "expr": "rate(vllm:generation_tokens_total[1m])",
+                        "legendFormat": "{{ model_id }} — {{ instance_name }}"
+                    }
+                ]
+            }
+        ]
+    }
+}
