@@ -1,26 +1,52 @@
+# QuantServe Model Onboarding Pipeline
+#
+# Non-GPU steps run in Cloud Build containers.
+# GPU steps (quantize, evaluate, benchmark) run on a dedicated L4 Spot VM
+# provisioned by this pipeline and destroyed when complete.
+#
+# Required substitutions (set automatically by the Cloud Build trigger):
+#   _REGION, _ZONE, _BASE_BUCKET, _QUANT_BUCKET, _EVAL_BUCKET,
+#   _REG_BUCKET, _PIPELINE_SA, _ARTIFACT_REPO
+
 timeout: '7200s' # 2 hour max for large model quantization
 
 steps:
   # Step 1: Validate model config
   - id: 'validate-config'
     name: 'python3.11-slim'
-    entrypoint: 'python3'
+    entrypoint: 'bash'
     args:
       - '-c'
       - |
-        import yaml, sys
-        required_fields = [
-          'model_name', 'hf_model_id', 'quantization_scheme', 'recipe', 'calibration_dataset',
-          'num_calibration_samples', 'max_seq_length', 'benchmarks', 'thresholds'
-        ]
-        with open('${_MODEL_CONFIG}') as f:
-          config = yaml.safe_load(f)
-        missing = [f for f in required_fields if f not in config]
-        if missing:
-          print(f"Error: Missing fields in config: {missing}")
-          sys.exit(1)
-        print(f"Config valid: {config['model_name']} / {config['quantization_scheme']}")
+        pip install pyyaml -q
+        python3 - << 'EOF'
+        import yaml, sys, glob
 
+        # Find the changed model config
+        configs = glob.glob("model-configs/*.yaml")
+        if not configs:
+            print("ERROR: No model configs found in model-configs/")
+            sys.exit(1)
+
+        required_fields = [
+            'model_name', 'hf_model_id', 'quantization_scheme',
+            'recipe', 'calibration_dataset', 'num_calibration_samples',
+            'max_seq_length', 'benchmarks', 'thresholds'
+        ]
+
+        for config_path in configs:
+            with open(config_path) as f:
+                config = yaml.safe_load(f)
+            missing = [field for field in required_fields if field not in config]
+            if missing:
+                print(f"ERROR: {config_path} missing fields: {missing}")
+                sys.exit(1)
+            print(f"Config valid: {config_path} -> {config['model_name']} / {config['quantization_scheme']}")
+            # Write the config path for use in subsequent steps
+            with open('/workspace/model_config_path.txt', 'w') as f:
+                f.write(config_path)
+        EOF
+        
   # Step 2: Download base model (if not already in GCS)
   - id: 'download-model'
     name: 'gcr.io/$PROJECT_ID/quantserve-pipeline'

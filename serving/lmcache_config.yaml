@@ -1,0 +1,20 @@
+# LMCache configuration for QuantServe vLLM serving.
+# LMCache reduces TTFT for requests that share common prefixes
+# (e.g. long system prompts) by caching KV blocks.
+#
+# Current config: local CPU memory cache per replica.
+# For cross-replica sharing, uncomment the remote_url section
+# and provision a Redis instance in the serving subnet.
+
+chunk_size: 256
+
+# Local CPU memory cache
+local_device: "cpu"
+max_local_cpu_size: 5  # GB — adjust based on available CPU memory on the VM
+
+# Remote backend for cross-replica KV cache sharing (optional).
+# Requires a Redis instance on the serving subnet.
+# Uncomment and set the Redis host when ready:
+#
+# remote_url: "redis://10.0.2.100:6379"
+# remote_serde: "cachegen"
