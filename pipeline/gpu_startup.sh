@@ -68,10 +68,17 @@ HF_TOKEN=$(gcloud secrets versions access latest \
   --project="${PROJECT_ID}")
 
 echo "[gpu_startup] Running: download_model"
-$DOCKER_RUN python3 scripts/download_model.py \
-  --config /tmp/quantserve/model_config.yaml \
-  --bucket "${BASE_BUCKET}" \
-  -e HF_TOKEN="${HF_TOKEN}"
+docker run --rm --gpus all \
+  -v /tmp/quantserve:/tmp/quantserve \
+  -e BASE_BUCKET="${BASE_BUCKET}" \
+  -e QUANT_BUCKET="${QUANT_BUCKET}" \
+  -e EVAL_BUCKET="${EVAL_BUCKET}" \
+  -e GOOGLE_CLOUD_PROJECT="${PROJECT_ID}" \
+  -e HF_TOKEN="${HF_TOKEN}" \
+  "${ARTIFACT_REPO}:latest" \
+  python3 scripts/download_model.py \
+    --config /tmp/quantserve/model_config.yaml \
+    --bucket "${BASE_BUCKET}"
 
 # Step 2: Quantize
 echo "[gpu_startup] Running: quantize_model"

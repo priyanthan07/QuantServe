@@ -1,15 +1,3 @@
-# ---------- Project metadata ----------
-# Needed to resolve the Cloud Build service account email.
-
-data "google_project" "project" {
-  project_id = var.project_id
-}
-
-locals {
-  # Cloud Build's default service account
-  cloudbuild_sa = "serviceAccount:${data.google_project.project.number}@cloudbuild.gserviceaccount.com"
-}
-
 # ---------- Artifact Registry ----------
 # Stores the pipeline Docker image used by Cloud Build steps.
 
@@ -19,49 +7,6 @@ resource "google_artifact_registry_repository" "pipeline" {
   description   = "QuantServe pipeline Docker images"
   format        = "DOCKER"
   project       = var.project_id
-
-  depends_on = [var.apis_enabled]
-}
-
-# ---------- Cloud Build IAM ----------
-# Cloud Build SA needs these permissions to run the pipeline.
-
-resource "google_project_iam_member" "cloudbuild_storage_admin" {
-  project = var.project_id
-  role    = "roles/storage.objectAdmin"
-  member  = local.cloudbuild_sa
-}
-
-resource "google_project_iam_member" "cloudbuild_secret_accessor" {
-  project = var.project_id
-  role    = "roles/secretmanager.secretAccessor"
-  member  = local.cloudbuild_sa
-}
-
-resource "google_project_iam_member" "cloudbuild_log_writer" {
-  project = var.project_id
-  role    = "roles/logging.logWriter"
-  member  = local.cloudbuild_sa
-}
-
-resource "google_project_iam_member" "cloudbuild_artifact_writer" {
-  project = var.project_id
-  role    = "roles/artifactregistry.writer"
-  member  = local.cloudbuild_sa
-}
-
-# Cloud Build needs to be able to create and delete the GPU Spot VM
-resource "google_project_iam_member" "cloudbuild_compute_admin" {
-  project = var.project_id
-  role    = "roles/compute.admin"
-  member  = local.cloudbuild_sa
-}
-
-# Cloud Build needs to attach the pipeline service account to the GPU VM
-resource "google_project_iam_member" "cloudbuild_sa_user" {
-  project = var.project_id
-  role    = "roles/iam.serviceAccountUser"
-  member  = local.cloudbuild_sa
 }
 
 # ---------- Cloud Build Trigger: Build pipeline Docker image ----------
@@ -108,8 +53,6 @@ resource "google_cloudbuild_trigger" "build_pipeline_image" {
       ]
     }
   }
-
-  depends_on = [var.apis_enabled]
 }
 
 # ---------- Cloud Build Trigger: Model onboarding pipeline ----------
@@ -141,7 +84,4 @@ resource "google_cloudbuild_trigger" "model_onboarding" {
     _PIPELINE_SA        = var.pipeline_sa_email
     _ARTIFACT_REPO      = "${var.region}-docker.pkg.dev/${var.project_id}/quantserve/pipeline"
   }
-
-  depends_on = [var.apis_enabled]
 }
-

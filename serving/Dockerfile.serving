@@ -21,5 +21,6 @@ EXPOSE 8000
 # 3. Launch vLLM
 COPY startup.sh /opt/quantserve/startup.sh
 RUN chmod +x /opt/quantserve/startup.sh
+COPY lmcache_config.yaml /opt/quantserve/lmcache_config.yaml
 
 ENTRYPOINT ["/opt/quantserve/startup.sh"]

@@ -13,8 +13,8 @@ timeout: '7200s' # 2 hour max for large model quantization
 steps:
   # Step 1: Validate model config
   - id: 'validate-config'
-    name: 'python3.11-slim'
-    entrypoint: 'bash'
+    name: 'python:3.11-slim'
+    entrypoint: bash
     args:
       - '-c'
       - |
@@ -49,67 +49,63 @@ steps:
         
   # Step 2: Download base model (if not already in GCS)
   - id: 'download-model'
-    name: 'gcr.io/$PROJECT_ID/quantserve-pipeline'
-    entrypoint: 'python3'
+    name: '${_ARTIFACT_REPO}:latest'
+    entrypoint: bash
     args:
-      - 'scripts/download_model.py'
-      - '--config'
-      - '${_MODEL_CONFIG}'
-      - '--bucket'
-      - '${_BASE_BUCKET}'
+      - '-c'
+      - |
+        python3 scripts/download_model.py \
+          --config "$(cat /workspace/model_config_path.txt)" \
+          --bucket "${_BASE_BUCKET}"
     secretEnv: ['HF_TOKEN']
 
   # Step 3: Quantize
   - id: 'quantize'
-    name: 'gcr.io/$PROJECT_ID/quantserve-pipeline'
-    entrypoint: 'python3'
+    name: '${_ARTIFACT_REPO}:latest'
+    entrypoint: bash
     args:
-      - 'scripts/quantize_model.py'
-      - '--config'
-      - '${_MODEL_CONFIG}'
-      - '--base-bucket'
-      - '${_BASE_BUCKET}'
-      - '--quant-bucket'
-      - '${_QUANT_BUCKET}'
+      - '-c'
+      - |
+        python3 scripts/quantize_model.py \
+          --config "$(cat /workspace/model_config_path.txt)" \
+          --base-bucket "${_BASE_BUCKET}" \
+          --quant-bucket "${_QUANT_BUCKET}"
   
   # Step 4: Evaluate with lm_eval
   - id: 'evaluate'
-    name: 'gcr.io/$PROJECT_ID/quantserve-pipeline'
-    entrypoint: 'python3'
+    name: '${_ARTIFACT_REPO}:latest'
+    entrypoint: bash
     args:
-      - 'scripts/evaluate_model.py'
-      - '--config'
-      - '${_MODEL_CONFIG}'
-      - '--quant-bucket'
-      - '${_QUANT_BUCKET}'
-      - '--eval-bucket'
-      - '${_EVAL_BUCKET}'
+      - '-c'
+      - |
+        python3 scripts/evaluate_model.py \
+          --config "$(cat /workspace/model_config_path.txt)" \
+          --quant-bucket "${_QUANT_BUCKET}" \
+          --eval-bucket "${_EVAL_BUCKET}"
 
   # Step 5: Benchmark with GuideLLM 
   - id: 'benchmark'
-    name: 'gcr.io/$PROJECT_ID/quantserve-pipeline'
-    entrypoint: 'python3'
+    name: '${_ARTIFACT_REPO}:latest'
+    entrypoint: bash
     args:
-      - 'scripts/benchmark_model.py'
-      - '--config'
-      - '${_MODEL_CONFIG}'
-      - '--quant-bucket'
-      - '${_QUANT_BUCKET}'
-      - '--eval-bucket'
-      - '${_EVAL_BUCKET}'
+      - '-c'
+      - |
+        python3 scripts/benchmark_model.py \
+          --config "$(cat /workspace/model_config_path.txt)" \
+          --quant-bucket "${_QUANT_BUCKET}" \
+          --eval-bucket "${_EVAL_BUCKET}"
 
   # Step 6: Update model registry
   - id: 'update-registry'
-    name: 'gcr.io/$PROJECT_ID/quantserve-pipeline'
-    entrypoint: 'python3'
+    name: '${_ARTIFACT_REPO}:latest'
+    entrypoint: bash
     args:
-      - 'scripts/update_registry.py'
-      - '--config'
-      - '${_MODEL_CONFIG}'
-      - '--eval-bucket'
-      - '${_EVAL_BUCKET}'
-      - '--registry-bucket'
-      - '${_REG_BUCKET}'
+      - '-c'
+      - |
+        python3 scripts/update_registry.py \
+          --config "$(cat /workspace/model_config_path.txt)" \
+          --eval-bucket "${_EVAL_BUCKET}" \
+          --registry-bucket "${_REG_BUCKET}"
   
 availableSecrets:
   secretManager:

@@ -15,7 +15,7 @@ module "apis" {
 module "secrets" {
   source       = "./modules/secrets"
   project_id   = var.project_id
-  apis_enabled = module.apis
+  apis_enabled = module.apis.enabled
 }
 
 # ---------- Networking ----------
@@ -68,7 +68,7 @@ module "cicd" {
   eval_results_bucket   = module.storage.evaluation_results_bucket_name
   model_registry_bucket = module.storage.model_registry_bucket_name
   pipeline_sa_email     = module.iam.pipeline_sa_email
-  apis_enabled          = module.apis
+  apis_enabled          = module.apis.enabled
 }
 
 # ---------- Compute (serving instances per model) ----------

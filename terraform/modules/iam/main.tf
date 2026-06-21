@@ -108,3 +108,56 @@ resource "google_project_iam_member" "observability_compute_viewer" {
   role    = "roles/compute.viewer"
   member  = "serviceAccount:${google_service_account.observability.email}"
 }
+
+# ---------- Project metadata ----------
+# Needed to resolve the Cloud Build service account email.
+
+data "google_project" "project" {
+  project_id = var.project_id
+}
+
+locals {
+  # Cloud Build's default service account
+  cloudbuild_sa = "serviceAccount:${data.google_project.project.number}@cloudbuild.gserviceaccount.com"
+}
+
+# ---------- Cloud Build IAM ----------
+# Cloud Build SA needs these permissions to run the pipeline.
+
+resource "google_project_iam_member" "cloudbuild_storage_admin" {
+  project = var.project_id
+  role    = "roles/storage.objectAdmin"
+  member  = local.cloudbuild_sa
+}
+
+resource "google_project_iam_member" "cloudbuild_secret_accessor" {
+  project = var.project_id
+  role    = "roles/secretmanager.secretAccessor"
+  member  = local.cloudbuild_sa
+}
+
+resource "google_project_iam_member" "cloudbuild_log_writer" {
+  project = var.project_id
+  role    = "roles/logging.logWriter"
+  member  = local.cloudbuild_sa
+}
+
+resource "google_project_iam_member" "cloudbuild_artifact_writer" {
+  project = var.project_id
+  role    = "roles/artifactregistry.writer"
+  member  = local.cloudbuild_sa
+}
+
+# Cloud Build needs to be able to create and delete the GPU Spot VM
+resource "google_project_iam_member" "cloudbuild_compute_admin" {
+  project = var.project_id
+  role    = "roles/compute.admin"
+  member  = local.cloudbuild_sa
+}
+
+# Cloud Build needs to attach the pipeline service account to the GPU VM
+resource "google_project_iam_member" "cloudbuild_sa_user" {
+  project = var.project_id
+  role    = "roles/iam.serviceAccountUser"
+  member  = local.cloudbuild_sa
+}

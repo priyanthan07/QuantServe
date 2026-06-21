@@ -11,8 +11,6 @@ resource "google_secret_manager_secret" "hf_token" {
   replication {
     auto {}
   }
-
-  depends_on = [var.apis_enabled]
 }
 
 resource "google_secret_manager_secret" "inference_api_key" {
@@ -22,6 +20,4 @@ resource "google_secret_manager_secret" "inference_api_key" {
   replication {
     auto {}
   }
-
-  depends_on = [var.apis_enabled]
 }

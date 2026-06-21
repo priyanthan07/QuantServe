@@ -10,6 +10,7 @@ VLLM_EXTRA_ARGS="${vllm_args}"
 PROJECT_ID="${project_id}"
  
 LOCAL_MODEL_DIR="/models/$${MODEL_ID}"
+LMCACHE_CONFIG="/opt/quantserve/lmcache_config.yaml"
 SECRET_NAME="inference-api-key"
 
 echo "[quantserve] Starting model onload for $${MODEL_ID}"
@@ -27,7 +28,13 @@ VLLM_API_KEY=$(gcloud secrets versions access latest \
   --project="$${PROJECT_ID}")
 export VLLM_API_KEY
 
-# ---------- Step 3: Start vLLM ----------
+# ---------- Step 3: Configure LMCache ----------
+# LMCache reduces TTFT for requests sharing common prefixes
+# by caching KV blocks in local CPU memory.
+export LMCACHE_CONFIG_FILE="$${LMCACHE_CONFIG}"
+echo "[quantserve] LMCache config: $${LMCACHE_CONFIG_FILE}"
+
+# ---------- Step 4: Start vLLM ----------
 echo "[quantserve] Starting vLLM for model $${MODEL_ID}"
 exec python -m vllm.entrypoints.openai.api_server \
   --model "$${LOCAL_MODEL_DIR}" \
