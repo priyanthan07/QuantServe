@@ -101,6 +101,13 @@ $DOCKER_RUN python3 scripts/benchmark_model.py \
   --quant-bucket "${QUANT_BUCKET}" \
   --eval-bucket "${EVAL_BUCKET}"
 
+# Step 5: Update model registry
+echo "[gpu_startup] Running: update_registry"
+$DOCKER_RUN python3 scripts/update_registry.py \
+  --config /tmp/quantserve/model_config.yaml \
+  --eval-bucket "${EVAL_BUCKET}" \
+  --registry-bucket "${REG_BUCKET}"
+
 # ---------- Signal success ----------
 echo "SUCCESS" | gcloud storage cp - "${COMPLETION_FLAG}"
 echo "[gpu_startup] GPU pipeline complete. Signalled ${COMPLETION_FLAG}"

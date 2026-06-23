@@ -18,16 +18,17 @@ RUN curl -faSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key a
 
 # Python dependencies for the full pipeline
 RUN pip install --no-cache-dir --break-system-packages \
-    torch \
-    transformers \
-    huggingface_hub \
-    llmcompressor \
-    lm_eval \
-    vllm \
-    guidellm \
-    google-cloud-storage \
-    google-cloud-secret-manager \
-    pyyaml
+    torch==2.4.1 \
+    transformers==4.45.0 \
+    huggingface_hub==0.25.1 \
+    llmcompressor==0.4.0 \
+    lm_eval==0.4.4 \
+    vllm==0.6.3 \
+    guidellm==0.2.0 \
+    google-cloud-storage==2.18.2 \
+    google-cloud-secret-manager==2.20.2 \
+    pyyaml==6.0.2 \
+    openai==1.51.0
 
 # Copy pipeline scripts
 COPY scripts/ /opt/quantserve/scripts/

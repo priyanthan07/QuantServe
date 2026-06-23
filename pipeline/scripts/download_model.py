@@ -22,8 +22,9 @@ def get_hf_commit_hash(model_id: str) -> str:
     """
         Get the latest commit hash for a HuggingFace model
     """
-    api = HfApi()
-    model_info = api.model_info(model_id)
+    token = os.environ.get("HF_TOKEN")
+    api = HfApi(token=token)
+    model_info = api.model_info(model_id, token=token)
     return model_info.sha
 
 def download_and_upload(model_id: str, commit_hash: str, bucket_name: str):

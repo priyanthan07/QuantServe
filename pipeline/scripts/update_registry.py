@@ -99,6 +99,13 @@ def upload_registry_entry(entry: dict, bucket_name: str, model_key: str):
     )
     print(f"Registry entry uploaded to gs://{bucket_name}/{blob_path}")
     
+    latest_blob = bucket.blob(f"{model_key}-latest.json")
+    latest_blob.upload_from_string(
+        json.dumps({"gcs_artifact_path": f"{model_key}/{entry['version']}"}),
+        content_type="application/json",
+    )
+    print(f"Latest pointer written to gs://{bucket_name}/{model_key}-latest.json")
+    
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--config", required=True)
