@@ -5,10 +5,11 @@
 locals {
   startup_script = templatefile("${path.module}/../../serving/startup.sh", {
     quantized_models_bucket = var.quantized_models_bucket
-    gcs_artifact_path       = var.gcs_artifact_path
+    model_registry_bucket   = var.model_registry_bucket
     model_id                = var.model_id
     vllm_args               = var.vllm_args
     project_id              = var.project_id
+    serving_image_url       = var.serving_image_url
   })
 }
 
@@ -97,7 +98,7 @@ resource "google_compute_instance_group_manager" "serving" {
 
   auto_healing_policies {
     health_check      = google_compute_health_check.vllm.id
-    initial_delay_sec = 300 # 5 min grace period for model loading
+    initial_delay_sec = 600 # 10 min grace period for model loading
   }
 }
 

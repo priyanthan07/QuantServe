@@ -83,7 +83,6 @@ module "compute" {
   environment = var.environment
 
   model_id          = each.key
-  gcs_artifact_path = each.value.gcs_artifact_path
   gpu_type          = each.value.gpu_type
   machine_type      = each.value.machine_type
   min_replicas      = each.value.min_replicas
@@ -94,6 +93,8 @@ module "compute" {
   subnet_self_link       = module.networking.serving_subnet_self_link
   serving_sa_email       = module.iam.serving_sa_email
   quantized_models_bucket = module.storage.quantized_models_bucket_name
+  model_registry_bucket   = module.storage.model_registry_bucket_name
+  serving_image_url = module.cicd.serving_image_url
 
   depends_on = [module.apis]
 }
@@ -136,4 +137,3 @@ module "observability" {
 
   depends_on = [module.apis]
 }
-

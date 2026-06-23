@@ -85,3 +85,45 @@ resource "google_cloudbuild_trigger" "model_onboarding" {
     _ARTIFACT_REPO      = "${var.region}-docker.pkg.dev/${var.project_id}/quantserve/pipeline"
   }
 }
+
+resource "google_cloudbuild_trigger" "build_serving_image" {
+  name        = "quantserve-build-serving-image"
+  description = "Builds the QuantServe vLLM serving Docker image"
+  project     = var.project_id
+  location    = "global"
+
+  trigger_template {
+    branch_name = "^main$"
+    repo_name   = var.csr_repo_name
+  }
+
+  included_files = [
+    "serving/Dockerfile.serving",
+    "serving/startup.sh",
+    "serving/lmcache_config.yaml",
+  ]
+
+  build {
+    step {
+      name = "gcr.io/cloud-builders/docker"
+      args = [
+        "build",
+        "-t", "${var.region}-docker.pkg.dev/${var.project_id}/quantserve/serving:$COMMIT_SHA",
+        "-t", "${var.region}-docker.pkg.dev/${var.project_id}/quantserve/serving:latest",
+        "-f", "serving/Dockerfile.serving",
+        "serving/",
+      ]
+    }
+    step {
+      name = "gcr.io/cloud-builders/docker"
+      args = [
+        "push", "--all-tags",
+        "${var.region}-docker.pkg.dev/${var.project_id}/quantserve/serving",
+      ]
+    }
+  }
+}
+
+output "serving_image_url" {
+  value = "${var.region}-docker.pkg.dev/${var.project_id}/quantserve/serving"
+}

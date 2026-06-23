@@ -21,3 +21,12 @@ resource "google_secret_manager_secret" "inference_api_key" {
     auto {}
   }
 }
+
+resource "google_secret_manager_secret" "grafana_admin_password" {
+  secret_id = "grafana-admin-password"
+  project   = var.project_id
+  replication { 
+    auto {} 
+  }
+}
+

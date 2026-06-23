@@ -15,12 +15,7 @@ variable "environment" {
 }
 
 variable "model_id" {
-  description = "Unique identifier for this model (e.g. qwen3-7b-w4a16)"
-  type        = string
-}
-
-variable "gcs_artifact_path" {
-  description = "Path within the quantized-models bucket (e.g. qwen3-7b-w4a16/v1)"
+  description = "Unique identifier for this model (e.g. qwen3-8b-w4a16)"
   type        = string
 }
 
@@ -65,4 +60,14 @@ variable "serving_sa_email" {
 
 variable "quantized_models_bucket" {
   type = string
+}
+
+variable "serving_image_url" {
+  description = "Artifact Registry URL for the vLLM serving Docker image"
+  type        = string
+}
+
+variable "model_registry_bucket" {
+  description = "GCS bucket for the model registry (used to resolve the latest artifact path at boot)"
+  type        = string
 }

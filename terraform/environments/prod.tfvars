@@ -1,14 +1,15 @@
-project_id  = "your-gcp-project-id"
+project_id  = "499501"
 region      = "us-central1"
 zone        = "us-central1-a"
 environment = "prod"
+domain_suffix = "quantserve.com" 
 
-alert_notification_channel_email = "ops-team@example.com"
-ttft_p99_slo_seconds             = 2.0
+alert_notification_channel_email = "priyanthangovindaraj@gmail.com"
+ttft_p99_slo_seconds             = 3.0
 
 models = {
-  "qwen3-7b-w4a16" = {
-    gcs_artifact_path = "qwen3-7b-w4a16/v1"
+  "qwen3-8b-w4a16" = {
+    gcs_artifact_path = "qwen3-8b-w4a16/v1"
     gpu_type          = "nvidia-l4"
     machine_type      = "g2-standard-4"
     min_replicas      = 1

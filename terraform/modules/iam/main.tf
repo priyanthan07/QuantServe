@@ -69,6 +69,12 @@ resource "google_project_iam_member" "pipeline_log_writer" {
   member  = "serviceAccount:${google_service_account.pipeline.email}"
 }
 
+resource "google_project_iam_member" "pipeline_compute_instance_admin" {
+  project = var.project_id
+  role    = "roles/compute.instanceAdmin.v1"
+  member  = "serviceAccount:${google_service_account.pipeline.email}"
+}
+
 # ---------- Serving SA Bindings ----------
 
 resource "google_storage_bucket_iam_member" "serving_read_quantized" {

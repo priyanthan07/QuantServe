@@ -33,7 +33,6 @@ variable "csr_repo_name" {
 variable "models" {
   description = "Map of models to serve. Key = model ID, value = config."
   type = map(object({
-    gcs_artifact_path = string # e.g. "qwen3-7b-w4a16/v1"
     gpu_type          = string # e.g. "nvidia-l4"
     machine_type      = string # e.g. "g2-standard-4"
     min_replicas      = number
