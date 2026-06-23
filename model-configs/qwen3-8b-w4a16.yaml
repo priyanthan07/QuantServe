@@ -1,4 +1,4 @@
-model_name: "qwen3-7b"
+model_name: "qwen3-8b"
 hf_model_id: "Qwen/Qwen3-8B"
 
 # Quantization
@@ -25,6 +25,7 @@ thresholds:
   mmlu: 0.30
   arc_challenge: 0.25
   truthfulqa_mc2: 0.30
+  gsm8k: 0.45
 
 # vLLM serving arguments (passed through to the serving startup script)
 vllm_args: "--max-model-len 4096 --enable-prefix-caching"

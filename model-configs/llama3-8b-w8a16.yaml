@@ -25,6 +25,7 @@ thresholds:
   mmlu: 0.35
   arc_challenge: 0.30
   truthfulqa_mc2: 0.35
+  gsm8k: 0.55
 
 # vLLM serving arguments (passed through to the serving startup script)
 vllm_args: "--max-model-len 4096 --enable-prefix-caching"
