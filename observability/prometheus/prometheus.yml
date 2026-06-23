@@ -15,7 +15,7 @@ scrape_configs:
   # within one scrape interval of becoming healthy.
   - job_name: "vllm"
     gce_sd_configs:
-      - project: "YOUR_PROJECT_ID"    # Replace with actual project ID
+      - project: "499501"    # Replace with actual project ID
         zone: "us-central1-a"          # Replace with actual zone
         port: 8000
         filter: '(tags.items = "vllm-serving")'
