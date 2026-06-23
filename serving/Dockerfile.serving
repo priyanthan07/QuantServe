@@ -1,7 +1,7 @@
-FROM vllm/vllm-openai:latest
+FROM vllm/vllm-openai:v0.23.0
 
 # LMCache for cross-replica KV cache sharing
-RUN pip install lmcache --no-cache-dir
+RUN pip install lmcache==0.4.7 --no-cache-dir
 
 # Google Cloud SDK for fetching model from GCS and secrets
 RUN apt-get update && \
