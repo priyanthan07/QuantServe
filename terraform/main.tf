@@ -107,6 +107,7 @@ module "load_balancer" {
 
   project_id  = var.project_id
   environment = var.environment
+  domain_suffix = var.domain_suffix
 
   model_id       = each.key
   instance_group = module.compute[each.key].instance_group_self_link
@@ -129,6 +130,7 @@ module "observability" {
   models                          = var.models
   alert_notification_channel_email = var.alert_notification_channel_email
   ttft_p99_slo_seconds            = var.ttft_p99_slo_seconds
+  domain_suffix                    = var.domain_suffix
 
   vllm_instance_groups = {
     for model_id, _ in var.models :

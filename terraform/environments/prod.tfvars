@@ -9,22 +9,20 @@ ttft_p99_slo_seconds             = 3.0
 
 models = {
   "qwen3-8b-w4a16" = {
-    gcs_artifact_path = "qwen3-8b-w4a16/v1"
     gpu_type          = "nvidia-l4"
     machine_type      = "g2-standard-4"
     min_replicas      = 1
     max_replicas      = 3
-    disk_size_gb      = 100
+    disk_size_gb      = 200
     vllm_args         = "--max-model-len 4096 --enable-prefix-caching"
   }
 
   "llama3-8b-w8a16" = {
-    gcs_artifact_path = "llama3-8b-w8a16/v1"
     gpu_type          = "nvidia-l4"
     machine_type      = "g2-standard-4"
     min_replicas      = 1
     max_replicas      = 3
-    disk_size_gb      = 100
+    disk_size_gb      = 200
     vllm_args         = "--max-model-len 4096 --enable-prefix-caching"
   }
 }

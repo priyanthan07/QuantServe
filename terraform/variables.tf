@@ -56,3 +56,8 @@ variable "ttft_p99_slo_seconds" {
   type        = number
   default     = 3.0
 }
+
+variable "domain_suffix" {
+  description = "Base domain for serving endpoints. Must be a domain you control. e.g. inference.mycompany.com"
+  type        = string
+}

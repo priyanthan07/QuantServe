@@ -85,10 +85,10 @@ def main():
     with open(args.config) as f:
         config = yaml.safe_load(f)
 
-    with open("/tmp/quant_local_dir.txt") as f:
+    with open("/tmp/quantserve/quant_local_dir.txt") as f:
         model_path = f.read().strip()
 
-    with open("/tmp/quant_version.txt") as f:
+    with open("/tmp/quantserve/quant_version.txt") as f:
         version = f.read().strip()
 
     model_name = config["model_name"]

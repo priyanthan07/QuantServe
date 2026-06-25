@@ -54,6 +54,7 @@ resource "google_compute_instance_template" "serving" {
 
   metadata = {
     startup-script = local.startup_script
+    model_id       = var.model_id
   }
 
   lifecycle {

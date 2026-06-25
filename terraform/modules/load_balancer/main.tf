@@ -44,7 +44,7 @@ resource "google_compute_managed_ssl_certificate" "lb" {
   managed {
     # Replace with your actual domain when ready.
     # Until then, access via IP with HTTP target proxy instead.
-    domains = ["${var.model_id}.inference.example.com"]
+    domains = ["${var.model_id}.${var.domain_suffix}"]
   }
 }
 

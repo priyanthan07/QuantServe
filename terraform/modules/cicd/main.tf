@@ -123,7 +123,3 @@ resource "google_cloudbuild_trigger" "build_serving_image" {
     }
   }
 }
-
-output "serving_image_url" {
-  value = "${var.region}-docker.pkg.dev/${var.project_id}/quantserve/serving"
-}

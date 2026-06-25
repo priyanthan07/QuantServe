@@ -19,3 +19,8 @@ variable "health_check" {
   description = "Self link of the health check"
   type        = string
 }
+
+variable "domain_suffix" {
+  description = "Base domain suffix for this model's SSL cert"
+  type        = string
+}

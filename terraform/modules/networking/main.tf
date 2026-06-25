@@ -130,3 +130,19 @@ resource "google_compute_firewall" "allow_iap_grafana" {
   source_ranges = ["35.235.240.0/20"]
   target_tags   = ["prometheus"]
 }
+
+# Allow GCP load balancer health check probes to reach Grafana
+resource "google_compute_firewall" "allow_lb_grafana" {
+  name    = "quantserve-allow-lb-grafana-${var.environment}"
+  project = var.project_id
+  network = google_compute_network.main.id
+
+  allow {
+    protocol = "tcp"
+    ports    = ["3000"]
+  }
+
+  # Same IP ranges used for vLLM health checks — these are GCP's global LB ranges
+  source_ranges = ["130.211.0.0/22", "35.191.0.0/16"]
+  target_tags   = ["prometheus"]
+}

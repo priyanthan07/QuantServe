@@ -39,3 +39,9 @@ variable "ttft_p99_slo_seconds" {
   type    = number
   default = 3.0
 }
+
+# ADD THIS:
+variable "domain_suffix" {
+  description = "Base domain suffix. Grafana will be at grafana.DOMAIN_SUFFIX"
+  type        = string
+}

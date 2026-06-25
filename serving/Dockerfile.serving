@@ -1,4 +1,4 @@
-FROM vllm/vllm-openai:v0.23.0
+FROM vllm/vllm-openai:v0.22.1
 
 # LMCache for cross-replica KV cache sharing
 RUN pip install lmcache==0.4.7 --no-cache-dir

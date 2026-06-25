@@ -44,7 +44,6 @@ echo "[quantserve] Starting vLLM container for $${MODEL_ID}"
 exec docker run --rm --gpus all \
   -v "$${LOCAL_MODEL_DIR}":"$${LOCAL_MODEL_DIR}" \
   -e VLLM_API_KEY="$${VLLM_API_KEY}" \
-  -e LMCACHE_CONFIG_FILE="/opt/quantserve/lmcache_config.yaml" \
   -p 8000:8000 \
   "$${SERVING_IMAGE}:latest" \
   python -m vllm.entrypoints.openai.api_server \
@@ -55,5 +54,7 @@ exec docker run --rm --gpus all \
     --dtype auto \
     --trust-remote-code \
     --api-key "$${VLLM_API_KEY}" \
+    --kv-transfer-config '{"kv_connector":"LMCacheConnectorV1","kv_role":"kv_both"}' \
+    --kv-offloading-size 5 \
     $${VLLM_EXTRA_ARGS}
   
