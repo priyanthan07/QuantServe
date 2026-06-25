@@ -1,2 +1,2 @@
-bucket = "499501-terraform-state"
-prefix = "QuantServe-prod"
+bucket = "46599-terraform-state"
+prefix = "quantserve-dev"

@@ -1,8 +1,9 @@
-project_id  = "499501"
+project_id  = "dev-46599"
 region      = "us-central1"
 zone        = "us-central1-a"
 environment = "dev"
-domain_suffix = "dev-quantserve.com" 
+domain_suffix = "dev-quantserve.com"
+dns_zone_name = "dev-quantserve-com"
 
 alert_notification_channel_email = "priyanthangovindaraj@gmail.com"
 ttft_p99_slo_seconds             = 3.0

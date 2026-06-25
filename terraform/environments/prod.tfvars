@@ -1,23 +1,15 @@
-project_id  = "499501"
+project_id  = "personal-499501"
 region      = "us-central1"
 zone        = "us-central1-a"
 environment = "prod"
-domain_suffix = "quantserve.com" 
+domain_suffix = "quant-serve.com"
+dns_zone_name = "quant-serve-com"
 
 alert_notification_channel_email = "priyanthangovindaraj@gmail.com"
 ttft_p99_slo_seconds             = 3.0
 
 models = {
   "qwen3-8b-w4a16" = {
-    gpu_type          = "nvidia-l4"
-    machine_type      = "g2-standard-4"
-    min_replicas      = 1
-    max_replicas      = 3
-    disk_size_gb      = 200
-    vllm_args         = "--max-model-len 4096 --enable-prefix-caching"
-  }
-
-  "llama3-8b-w8a16" = {
     gpu_type          = "nvidia-l4"
     machine_type      = "g2-standard-4"
     min_replicas      = 1
