@@ -100,7 +100,7 @@ steps:
           --boot-disk-size="200GB" \
           --boot-disk-type="pd-ssd" \
           --no-address \
-          --subnet="quantserve-pipeline" \
+          --subnet="quantserve-pipeline-${_ENVIRONMENT}" \
           --service-account="${_PIPELINE_SA}" \
           --scopes="cloud-platform" \
           --maintenance-policy=TERMINATE \

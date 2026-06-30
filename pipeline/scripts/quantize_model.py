@@ -103,7 +103,7 @@ def main():
     hf_model_id = config["hf_model_id"]
  
     # Read commit hash from download step
-    commit_hash_file = "/tmp/hf_commit_hash.txt"
+    commit_hash_file = "/tmp/quantserve/hf_commit_hash.txt"
     if os.path.exists(commit_hash_file):
         with open(commit_hash_file) as f:
             commit_hash = f.read().strip()
@@ -112,7 +112,7 @@ def main():
  
     # Paths
     base_model_dir = f"/tmp/base-model/{model_name}"
-    output_dir = f"/tmp/quantized/{model_name}-{scheme.lower()}"
+    output_dir = f"/tmp/quantserve/quantized/{model_name}-{scheme.lower()}"
     gcs_base_prefix = f"{hf_model_id.replace('/', '_')}/{commit_hash}"
     version = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S")
     gcs_quant_prefix = f"{model_name}-{scheme.lower()}/{version}"
@@ -132,11 +132,11 @@ def main():
     upload_to_gcs(output_dir, args.quant_bucket, gcs_quant_prefix)
  
     # Write version for downstream steps
-    with open("/tmp/quant_version.txt", "w") as f:
+    with open("/tmp/quantserve/quant_version.txt", "w") as f:
         f.write(version)
-    with open("/tmp/quant_gcs_prefix.txt", "w") as f:
+    with open("/tmp/quantserve/quant_gcs_prefix.txt", "w") as f:
         f.write(gcs_quant_prefix)
-    with open("/tmp/quant_local_dir.txt", "w") as f:
+    with open("/tmp/quantserve/quant_local_dir.txt", "w") as f:
         f.write(output_dir)
  
     print(f"Quantization pipeline complete: {gcs_quant_prefix}")

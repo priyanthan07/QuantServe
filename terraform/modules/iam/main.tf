@@ -57,6 +57,12 @@ resource "google_storage_bucket_iam_member" "pipeline_write_registry" {
   member = "serviceAccount:${google_service_account.pipeline.email}"
 }
 
+resource "google_storage_bucket_iam_member" "serving_read_registry" {
+  bucket = var.model_registry_bucket
+  role   = "roles/storage.objectViewer"
+  member = "serviceAccount:${google_service_account.serving.email}"
+}
+
 resource "google_project_iam_member" "pipeline_secret_accessor" {
   project = var.project_id
   role    = "roles/secretmanager.secretAccessor"
@@ -112,6 +118,12 @@ resource "google_project_iam_member" "observability_monitoring_viewer" {
 resource "google_project_iam_member" "observability_compute_viewer" {
   project = var.project_id
   role    = "roles/compute.viewer"
+  member  = "serviceAccount:${google_service_account.observability.email}"
+}
+
+resource "google_project_iam_member" "observability_secret_accessor" {
+  project = var.project_id
+  role    = "roles/secretmanager.secretAccessor"
   member  = "serviceAccount:${google_service_account.observability.email}"
 }
 

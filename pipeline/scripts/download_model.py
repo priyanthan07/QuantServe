@@ -73,13 +73,13 @@ def main():
     if model_exists_in_gcs(args.bucket, gcs_prefix):
         print(f"Model already exists at gs://{args.bucket}/{gcs_prefix}/ — skipping download")
         # Write commit hash for downstream steps
-        with open("/tmp/hf_commit_hash.txt", "w") as f:
+        with open("/tmp/quantserve/hf_commit_hash.txt", "w") as f:
             f.write(commit_hash)
         return
     
     download_and_upload(model_id, commit_hash, args.bucket)
     
-    with open("/tmp/hf_commit_hash.txt", "w") as f:
+    with open("/tmp/quantserve/hf_commit_hash.txt", "w") as f:
         f.write(commit_hash)
         
     print("Download complete.")

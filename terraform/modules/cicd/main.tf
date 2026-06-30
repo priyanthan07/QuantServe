@@ -77,6 +77,7 @@ resource "google_cloudbuild_trigger" "model_onboarding" {
   substitutions = {
     _REGION             = var.region
     _ZONE               = var.zone
+    _ENVIRONMENT   = var.environment
     _BASE_BUCKET        = var.base_models_bucket
     _QUANT_BUCKET       = var.quant_models_bucket
     _EVAL_BUCKET        = var.eval_results_bucket
