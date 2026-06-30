@@ -26,10 +26,6 @@ variable "models" {
   type = map(any)
 }
 
-variable "vllm_instance_groups" {
-  type = map(string)
-}
-
 variable "alert_notification_channel_email" {
   type    = string
   default = ""

@@ -18,15 +18,29 @@ output "model_registry_bucket" {
   value       = module.storage.model_registry_bucket_name
 }
 
-output "load_balancer_ips" {
-  description = "Map of model ID to load balancer IP address"
+output "api_ip" {
+  description = "Single external IP for all endpoints"
+  value       = module.load_balancer.external_ip
+}
+
+output "model_urls" {
+  description = "Endpoint URL for each model"
   value = {
     for model_id, _ in var.models :
-    model_id => module.load_balancer[model_id].external_ip
+    model_id => "https://${var.domain_suffix}/${model_id}/v1"
   }
+}
+
+output "grafana_url" {
+  value = "https://${var.domain_suffix}/grafana"
 }
 
 output "prometheus_internal_ip" {
   description = "Internal IP of the Prometheus/Grafana VM"
   value       = module.observability.prometheus_internal_ip
+}
+
+output "dns_nameservers" {
+  description = "Nameservers for this zone (already set by Cloud Domains)"
+  value       = module.dns.nameservers
 }

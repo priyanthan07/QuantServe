@@ -26,6 +26,21 @@ variable "csr_repo_name" {
   type        = string
 }
 
+variable "domain_suffix" {
+  description = "Root domain you own. e.g. dev-quantserve.com"
+  type        = string
+}
+
+variable "dns_zone_name" {
+  description = "Name of the existing Cloud DNS zone created by Cloud Domains"
+  type        = string
+}
+
+variable "default_model_id" {
+  description = "Model to use as the default backend for unmatched paths. Must be a key in the models map."
+  type        = string
+}
+
 # ---------- Serving models ----------
 # Each entry defines a model to be served.
 # The key is used as the model identifier throughout the system.
@@ -55,9 +70,4 @@ variable "ttft_p99_slo_seconds" {
   description = "TTFT p99 SLO threshold in seconds for alerting"
   type        = number
   default     = 3.0
-}
-
-variable "domain_suffix" {
-  description = "Base domain for serving endpoints. Must be a domain you control. e.g. inference.mycompany.com"
-  type        = string
 }

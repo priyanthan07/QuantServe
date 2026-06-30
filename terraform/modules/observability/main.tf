@@ -129,7 +129,7 @@ providers:
       path: /var/lib/grafana/dashboards
 DBEOF
 
-      # ---------- vLLM dashboard (embedded from repo) ----------
+      # ---------- vLLM dashboard ----------
       cat > /home/grafana/dashboards/vllm_overview.json << 'DASHEOF'
 {
     "dashboard": {
@@ -214,20 +214,20 @@ DASHEOF
         -v /home/grafana/provisioning:/etc/grafana/provisioning \
         -v /home/grafana/dashboards:/var/lib/grafana/dashboards \
         -e "GF_SECURITY_ADMIN_PASSWORD=$${GRAFANA_ADMIN_PASSWORD}" \
+        -e "GF_SERVER_SERVE_FROM_SUB_PATH=true" \
+        -e "GF_SERVER_ROOT_URL=https://${var.domain_suffix}/grafana/" \
         grafana/grafana:11.2.0
     SCRIPT
   }
 }
 
-# ---------- Unmanaged instance group for the LB backend ----------
-# The Prometheus VM is a single static VM, not a MIG.
-# A global HTTPS LB requires a backend group, so we wrap it in an unmanaged group.
+# ---------- Instance group for the shared LB ----------
 
 resource "google_compute_instance_group" "grafana" {
   name        = "quantserve-grafana-${var.environment}"
   project     = var.project_id
   zone        = var.zone
-  description = "Instance group wrapping the Prometheus/Grafana VM for load balancing"
+  description = "Instance group wrapping the Prometheus/Grafana VM"
 
   instances = [google_compute_instance.prometheus.id]
 
@@ -250,61 +250,8 @@ resource "google_compute_health_check" "grafana" {
 
   http_health_check {
     port         = 3000
-    request_path = "/api/health"
+    request_path = "/grafana/api/health"
   }
-}
-
-# ---------- Global HTTPS Load Balancer for Grafana ----------
-
-resource "google_compute_global_address" "grafana" {
-  name    = "quantserve-grafana-ip-${var.environment}"
-  project = var.project_id
-}
-
-resource "google_compute_backend_service" "grafana" {
-  name        = "quantserve-grafana-backend-${var.environment}"
-  project     = var.project_id
-  protocol    = "HTTP"
-  port_name   = "grafana"
-  timeout_sec = 30
-
-  health_checks = [google_compute_health_check.grafana.id]
-
-  backend {
-    group = google_compute_instance_group.grafana.id
-  }
-}
-
-resource "google_compute_url_map" "grafana" {
-  name            = "quantserve-grafana-urlmap-${var.environment}"
-  project         = var.project_id
-  default_service = google_compute_backend_service.grafana.id
-}
-
-resource "google_compute_managed_ssl_certificate" "grafana" {
-  name    = "quantserve-grafana-cert-${var.environment}"
-  project = var.project_id
-
-  managed {
-    domains = ["grafana.${var.domain_suffix}"]
-  }
-}
-
-resource "google_compute_target_https_proxy" "grafana" {
-  name    = "quantserve-grafana-proxy-${var.environment}"
-  project = var.project_id
-  url_map = google_compute_url_map.grafana.id
-
-  ssl_certificates = [google_compute_managed_ssl_certificate.grafana.id]
-}
-
-resource "google_compute_global_forwarding_rule" "grafana" {
-  name        = "quantserve-grafana-fwd-${var.environment}"
-  project     = var.project_id
-  ip_address  = google_compute_global_address.grafana.address
-  ip_protocol = "TCP"
-  port_range  = "443"
-  target      = google_compute_target_https_proxy.grafana.id
 }
 
 # ---------- Cloud Monitoring alert policies ----------

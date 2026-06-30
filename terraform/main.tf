@@ -103,15 +103,23 @@ module "compute" {
 
 module "load_balancer" {
   source   = "./modules/load_balancer"
-  for_each = var.models
 
   project_id  = var.project_id
   environment = var.environment
   domain_suffix = var.domain_suffix
+  default_model_id = var.default_model_id
 
-  model_id       = each.key
-  instance_group = module.compute[each.key].instance_group_self_link
-  health_check   = module.compute[each.key].health_check_self_link
+  model_backends = {
+    for model_id, _ in var.models : model_id => {
+      instance_group = module.compute[model_id].instance_group_self_link
+      health_check   = module.compute[model_id].health_check_self_link
+    }
+  }
+
+  grafana_backend = {
+    instance_group = module.observability.grafana_instance_group
+    health_check   = module.observability.grafana_health_check
+  }
 }
 
 # ---------- Observability ----------
@@ -126,16 +134,21 @@ module "observability" {
 
   subnet_self_link    = module.networking.observability_subnet_self_link
   observability_sa_email = module.iam.observability_sa_email
-
-  models                          = var.models
+  models                           = var.models
   alert_notification_channel_email = var.alert_notification_channel_email
-  ttft_p99_slo_seconds            = var.ttft_p99_slo_seconds
+  ttft_p99_slo_seconds             = var.ttft_p99_slo_seconds
   domain_suffix                    = var.domain_suffix
 
-  vllm_instance_groups = {
-    for model_id, _ in var.models :
-    model_id => module.compute[model_id].instance_group_self_link
-  }
-
   depends_on = [module.apis]
+}
+
+# ---------- DNS ----------
+
+module "dns" {
+  source = "./modules/dns"
+
+  project_id    = var.project_id
+  dns_zone_name = var.dns_zone_name
+  domain_suffix = var.domain_suffix
+  api_lb_ip     = module.load_balancer.external_ip
 }

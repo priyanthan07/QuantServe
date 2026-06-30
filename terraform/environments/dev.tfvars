@@ -4,6 +4,7 @@ zone        = "us-central1-a"
 environment = "dev"
 domain_suffix = "dev-quantserve.com"
 dns_zone_name = "dev-quantserve-com"
+default_model_id = "qwen3-8b-w4a16"
 
 alert_notification_channel_email = "priyanthangovindaraj@gmail.com"
 ttft_p99_slo_seconds             = 3.0
