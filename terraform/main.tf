@@ -139,6 +139,7 @@ module "observability" {
   alert_notification_channel_email = var.alert_notification_channel_email
   ttft_p99_slo_seconds             = var.ttft_p99_slo_seconds
   domain_suffix                    = var.domain_suffix
+  grafana_admin_password_secret_id = module.secrets.grafana_admin_password_secret_id
 
   depends_on = [module.apis]
 }

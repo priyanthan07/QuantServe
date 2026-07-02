@@ -130,7 +130,7 @@ def main():
  
     # Write warnings flag for downstream steps
     quality_warning = len(warnings) > 0
-    with open("/tmp/quality_warning.json", "w") as f:
+    with open("/tmp/quantserve/quality_warning.json", "w") as f:
         json.dump({"quality_warning": quality_warning, "warnings": warnings}, f)
  
     if quality_warning:

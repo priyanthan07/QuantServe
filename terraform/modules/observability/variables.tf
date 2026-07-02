@@ -41,3 +41,8 @@ variable "domain_suffix" {
   description = "Base domain suffix. Grafana will be at grafana.DOMAIN_SUFFIX"
   type        = string
 }
+
+variable "grafana_admin_password_secret_id" {
+  description = "Secret Manager secret ID for the Grafana admin password"
+  type        = string
+}

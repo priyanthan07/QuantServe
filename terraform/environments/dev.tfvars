@@ -15,7 +15,7 @@ models = {
     machine_type      = "g2-standard-4"
     min_replicas      = 1
     max_replicas      = 2
-    disk_size_gb      = 200
+    disk_size_gb      = 50
     vllm_args         = "--max-model-len 4096 --enable-prefix-caching"
   }
 }

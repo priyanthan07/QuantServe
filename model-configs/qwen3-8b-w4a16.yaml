@@ -21,11 +21,11 @@ benchmarks:
 # If a benchmark falls below its threshold, a quality warning is raised.
 # The pipeline continues regardless — these are advisory, not blocking.
 thresholds:
-  hellaswag: 0.35
-  mmlu: 0.30
+  hellaswag: 0.72
+  mmlu: 0.58
   arc_challenge: 0.25
   truthfulqa_mc2: 0.30
-  gsm8k: 0.45
+  gsm8k: 0.60
 
 # vLLM serving arguments (passed through to the serving startup script)
-vllm_args: "--max-model-len 4096 --enable-prefix-caching"
+vllm_args: "--max-model-len 4096 --enable-prefix-caching --enable-chunked-prefill"

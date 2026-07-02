@@ -21,14 +21,14 @@ RUN pip install --no-cache-dir --break-system-packages \
     torch==2.11.0 \
     transformers==4.45.0 \
     huggingface_hub==0.25.1 \
-    llmcompressor==0.4.0 \
-    lm_eval==0.4.4 \
+    llmcompressor==0.12.0 \
+    lm_eval==0.4.12 \
     vllm==0.22.1 \
     guidellm==0.2.0 \
     google-cloud-storage==2.18.2 \
     google-cloud-secret-manager==2.20.2 \
     pyyaml==6.0.2 \
-    openai==1.51.0
+    openai==2.43.0
 
 # Copy pipeline scripts
 COPY scripts/ /opt/quantserve/scripts/

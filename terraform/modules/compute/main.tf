@@ -3,7 +3,7 @@
 # Copies model from GCS, fetches API key from Secret Manager, starts vLLM.
 
 locals {
-  startup_script = templatefile("${path.module}/../../serving/startup.sh", {
+  startup_script = templatefile("${path.module}/../../../serving/startup.sh", {
     quantized_models_bucket = var.quantized_models_bucket
     model_registry_bucket   = var.model_registry_bucket
     model_id                = var.model_id

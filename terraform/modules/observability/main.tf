@@ -203,7 +203,7 @@ DASHEOF
 
       # ---------- Start Grafana ----------
       GRAFANA_ADMIN_PASSWORD=$(gcloud secrets versions access latest \
-        --secret="grafana-admin-password" \
+        --secret="${var.grafana_admin_password_secret_id}" \
         --project="${var.project_id}")
 
       docker run -d \
