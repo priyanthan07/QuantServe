@@ -190,6 +190,15 @@ DBEOF
 }
 DASHEOF
 
+      # ---------- Wait for Docker Hub to be reachable ----------
+      for i in $(seq 1 10); do
+        if docker pull prom/prometheus:v2.54.1; then
+          break
+        fi
+        echo "[quantserve] Docker Hub not reachable yet, retrying in 5s... ($i/10)"
+        sleep 5
+      done
+
       # ---------- Start Prometheus ----------
       docker run -d \
         --name prometheus \
