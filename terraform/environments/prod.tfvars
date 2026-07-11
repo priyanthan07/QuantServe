@@ -19,7 +19,3 @@ models = {
     vllm_args         = "--max-model-len 4096 --enable-prefix-caching"
   }
 }
-
-# ---------- Observability ----------
-alert_notification_channel_email = "priyanthangovindaraj@gmail.com"
-ttft_p99_slo_seconds             = 3.0

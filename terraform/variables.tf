@@ -21,11 +21,6 @@ variable "environment" {
   default     = "dev"
 }
 
-variable "csr_repo_name" {
-  description = "Cloud Source Repository name. Create at: console.cloud.google.com/source/repos"
-  type        = string
-}
-
 variable "domain_suffix" {
   description = "Root domain you own. e.g. dev-quantserve.com"
   type        = string

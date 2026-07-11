@@ -103,7 +103,7 @@ steps:
           --zone="${_ZONE}" \
           --machine-type="g2-standard-4" \
           --accelerator="type=nvidia-l4,count=1" \
-          --provisioning-model=SPOT \ 
+          --provisioning-model=SPOT \
           --image-family="common-cu124-debian-12-py311" \
           --image-project="ml-images" \
           --boot-disk-size="200GB" \

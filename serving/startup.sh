@@ -46,7 +46,6 @@ exec docker run --rm --gpus all \
   -e VLLM_API_KEY="$${VLLM_API_KEY}" \
   -p 8000:8000 \
   "$${SERVING_IMAGE}:latest" \
-  python -m vllm.entrypoints.openai.api_server \
     --model "$${LOCAL_MODEL_DIR}" \
     --served-model-name "$${MODEL_ID}" \
     --host 0.0.0.0 \
