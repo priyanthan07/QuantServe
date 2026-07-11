@@ -197,12 +197,13 @@ DASHEOF
         -p 9090:9090 \
         -v /home/prometheus/config:/etc/prometheus \
         -v /home/prometheus/data:/prometheus \
-        prom/prometheus:2.54.0 \
+        prom/prometheus:v2.54.1 \
         --config.file=/etc/prometheus/prometheus.yml \
         --storage.tsdb.retention.time=30d
 
       # ---------- Start Grafana ----------
-      GRAFANA_ADMIN_PASSWORD=$(gcloud secrets versions access latest \
+      GRAFANA_ADMIN_PASSWORD=$(docker run --rm --network=host google/cloud-sdk:slim \
+        gcloud secrets versions access latest \
         --secret="${var.grafana_admin_password_secret_id}" \
         --project="${var.project_id}")
 
@@ -230,7 +231,7 @@ resource "google_compute_instance_group" "grafana" {
   zone        = var.zone
   description = "Instance group wrapping the Prometheus/Grafana VM"
 
-  instances = [google_compute_instance.prometheus.id]
+  instances = [google_compute_instance.prometheus.self_link]
 
   named_port {
     name = "grafana"
