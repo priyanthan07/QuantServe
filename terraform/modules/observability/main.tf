@@ -26,7 +26,7 @@ resource "google_compute_instance" "prometheus" {
   }
 
   metadata = {
-    startup-script = <<-SCRIPT
+    startup-script = replace(<<-SCRIPT
       #!/bin/bash
       set -e
 
@@ -218,6 +218,7 @@ DASHEOF
         -e "GF_SERVER_ROOT_URL=https://${var.domain_suffix}/grafana/" \
         grafana/grafana:11.2.0
     SCRIPT
+    , "\r\n", "\n")
   }
 }
 
