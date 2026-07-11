@@ -36,6 +36,8 @@ resource "google_compute_instance" "prometheus" {
                /home/grafana/provisioning/dashboards \
                /home/grafana/dashboards
 
+      chmod -R 777 /home/prometheus /home/grafana
+
       # ---------- Prometheus config ----------
       cat > /home/prometheus/config/prometheus.yml << 'PROMEOF'
 global:
