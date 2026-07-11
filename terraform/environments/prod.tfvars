@@ -14,10 +14,12 @@ models = {
     gpu_type          = "nvidia-l4"
     machine_type      = "g2-standard-4"
     min_replicas      = 1
-    max_replicas      = 3
+    max_replicas      = 2
     disk_size_gb      = 50
     vllm_args         = "--max-model-len 4096 --enable-prefix-caching"
   }
 }
 
-csr_repo_name = "quantserve"
+# ---------- Observability ----------
+alert_notification_channel_email = "priyanthangovindaraj@gmail.com"
+ttft_p99_slo_seconds             = 3.0

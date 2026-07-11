@@ -14,11 +14,6 @@ variable "zone" {
   type = string
 }
 
-variable "csr_repo_name" {
-  description = "Cloud Source Repository name connected to this project"
-  type        = string
-}
-
 variable "base_models_bucket" {
   type = string
 }

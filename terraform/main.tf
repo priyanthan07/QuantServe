@@ -63,7 +63,6 @@ module "cicd" {
   region                = var.region
   zone                  = var.zone
   environment           = var.environment
-  csr_repo_name         = var.csr_repo_name
   base_models_bucket    = module.storage.base_models_bucket_name
   quant_models_bucket   = module.storage.quantized_models_bucket_name
   eval_results_bucket   = module.storage.evaluation_results_bucket_name

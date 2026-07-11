@@ -20,4 +20,6 @@ models = {
   }
 }
 
-csr_repo_name = "quantserve"
+# ---------- Observability ----------
+alert_notification_channel_email = "priyanthangovindaraj@gmail.com"
+ttft_p99_slo_seconds             = 3.0

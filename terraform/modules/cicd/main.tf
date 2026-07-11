@@ -17,14 +17,15 @@ resource "google_cloudbuild_trigger" "build_pipeline_image" {
   name        = "quantserve-build-pipeline-image"
   description = "Builds the QuantServe pipeline Docker image"
   project     = var.project_id
-  location    = "global"
+  location    = var.region
 
-  # Using Cloud Source Repositories.
-  # To use GitHub: replace trigger_template with a github {} block
-  # after connecting your repo at console.cloud.google.com/cloud-build/repositories
-  trigger_template {
-    branch_name = "^main$"
-    repo_name   = var.csr_repo_name
+  # ADD THIS:
+  github {
+    owner = "priyanthan07"
+    name  = "QuantServe"
+    push {
+      branch = "^main$"
+    }
   }
 
   included_files = [
@@ -63,11 +64,14 @@ resource "google_cloudbuild_trigger" "model_onboarding" {
   name        = "quantserve-model-onboarding"
   description = "Runs the full model onboarding pipeline when a model config changes"
   project     = var.project_id
-  location    = "global"
+  location    = var.region
 
-  trigger_template {
-    branch_name = "^main$"
-    repo_name   = var.csr_repo_name
+  github {
+    owner = "priyanthan07"
+    name  = "QuantServe"
+    push {
+      branch = "^main$"
+    }
   }
 
   included_files = ["model-configs/**"]
@@ -91,17 +95,19 @@ resource "google_cloudbuild_trigger" "build_serving_image" {
   name        = "quantserve-build-serving-image"
   description = "Builds the QuantServe vLLM serving Docker image"
   project     = var.project_id
-  location    = "global"
+  location    = var.region
 
-  trigger_template {
-    branch_name = "^main$"
-    repo_name   = var.csr_repo_name
+  github {
+    owner = "priyanthan07"
+    name  = "QuantServe"
+    push {
+      branch = "^main$"
+    }
   }
 
   included_files = [
     "serving/Dockerfile.serving",
     "serving/startup.sh",
-    "serving/lmcache_config.yaml",
   ]
 
   build {

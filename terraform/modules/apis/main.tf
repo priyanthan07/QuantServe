@@ -15,7 +15,6 @@ resource "google_project_service" "apis" {
         "artifactregistry.googleapis.com",
         "iam.googleapis.com",
         "cloudresourcemanager.googleapis.com",
-        "sourcerepo.googleapis.com",
         "dns.googleapis.com",
     ])
 
