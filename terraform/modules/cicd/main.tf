@@ -9,17 +9,11 @@ resource "google_artifact_registry_repository" "pipeline" {
   project       = var.project_id
 }
 
-data "google_cloudbuildv2_connection" "quantserve" {
-  project  = var.project_id
-  location = var.region
-  name     = "quantserve-repo"
-}
-
 resource "google_cloudbuildv2_repository" "quantserve" {
   project           = var.project_id
   location          = var.region
   name              = "quantserve"
-  parent_connection = data.google_cloudbuildv2_connection.quantserve.id
+  parent_connection = "projects/${var.project_id}/locations/${var.region}/connections/quantserve-repo"
   remote_uri        = "https://github.com/priyanthan07/QuantServe.git"
 }
 
