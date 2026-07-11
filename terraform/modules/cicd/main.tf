@@ -9,6 +9,20 @@ resource "google_artifact_registry_repository" "pipeline" {
   project       = var.project_id
 }
 
+data "google_cloudbuildv2_connection" "quantserve" {
+  project  = var.project_id
+  location = var.region
+  name     = "quantserve-repo"
+}
+
+resource "google_cloudbuildv2_repository" "quantserve" {
+  project           = var.project_id
+  location          = var.region
+  name              = "quantserve"
+  parent_connection = data.google_cloudbuildv2_connection.quantserve.id
+  remote_uri        = "https://github.com/priyanthan07/QuantServe.git"
+}
+
 # ---------- Cloud Build Trigger: Build pipeline Docker image ----------
 # Fires when Dockerfile.pipeline or any pipeline script changes.
 # Builds and pushes the image to Artifact Registry.
@@ -19,10 +33,8 @@ resource "google_cloudbuild_trigger" "build_pipeline_image" {
   project     = var.project_id
   location    = var.region
 
-  # ADD THIS:
-  github {
-    owner = "priyanthan07"
-    name  = "QuantServe"
+  repository_event_config {
+    repository = google_cloudbuildv2_repository.quantserve.id
     push {
       branch = "^main$"
     }
@@ -66,9 +78,8 @@ resource "google_cloudbuild_trigger" "model_onboarding" {
   project     = var.project_id
   location    = var.region
 
-  github {
-    owner = "priyanthan07"
-    name  = "QuantServe"
+  repository_event_config {
+    repository = google_cloudbuildv2_repository.quantserve.id
     push {
       branch = "^main$"
     }
@@ -97,9 +108,8 @@ resource "google_cloudbuild_trigger" "build_serving_image" {
   project     = var.project_id
   location    = var.region
 
-  github {
-    owner = "priyanthan07"
-    name  = "QuantServe"
+  repository_event_config {
+    repository = google_cloudbuildv2_repository.quantserve.id
     push {
       branch = "^main$"
     }
