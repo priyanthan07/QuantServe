@@ -120,6 +120,8 @@ module "load_balancer" {
     instance_group = module.observability.grafana_instance_group
     health_check   = module.observability.grafana_health_check
   }
+
+  depends_on = [module.apis]
 }
 
 # ---------- Observability ----------

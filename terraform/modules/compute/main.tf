@@ -24,7 +24,7 @@ resource "google_compute_instance_template" "serving" {
   tags = ["vllm-serving"]
 
   disk {
-    source_image = "projects/ml-images/global/images/family/common-cu124-debian-12-py311"
+    source_image = "projects/deeplearning-platform-release/global/images/family/common-cu129-ubuntu-2404-nvidia-580"
     auto_delete  = true
     boot         = true
     disk_type    = "pd-ssd"

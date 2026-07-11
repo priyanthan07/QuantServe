@@ -267,49 +267,6 @@ resource "google_monitoring_notification_channel" "email" {
   }
 }
 
-resource "google_monitoring_alert_policy" "gpu_cache_high" {
-  project      = var.project_id
-  display_name = "QuantServe: GPU Cache Usage > 90%"
-  combiner     = "OR"
-
-  conditions {
-    display_name = "GPU cache usage exceeds 90%"
-    condition_threshold {
-      filter          = "metric.type=\"custom.googleapis.com/vllm/gpu_cache_usage_perc\""
-      comparison      = "COMPARISON_GT"
-      threshold_value = 0.9
-      duration        = "120s"
-
-      aggregations {
-        alignment_period   = "60s"
-        per_series_aligner = "ALIGN_MEAN"
-      }
-    }
-  }
-
-  notification_channels = var.alert_notification_channel_email != "" ? [
-    google_monitoring_notification_channel.email[0].name
-  ] : []
-}
-
-resource "google_monitoring_alert_policy" "high_ttft" {
-  project      = var.project_id
-  display_name = "QuantServe: TTFT p99 above SLO"
-  combiner     = "OR"
-
-  conditions {
-    display_name = "TTFT p99 exceeds SLO"
-    condition_prometheus_query_language {
-      query    = "histogram_quantile(0.99, rate(vllm:time_to_first_token_seconds_bucket[5m])) > ${var.ttft_p99_slo_seconds}"
-      duration = "300s"
-    }
-  }
-
-  notification_channels = var.alert_notification_channel_email != "" ? [
-    google_monitoring_notification_channel.email[0].name
-  ] : []
-}
-
 resource "google_monitoring_alert_policy" "vllm_instance_down" {
   project      = var.project_id
   display_name = "QuantServe: vLLM instance down"
