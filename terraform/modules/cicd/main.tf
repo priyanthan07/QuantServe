@@ -30,7 +30,7 @@ resource "google_cloudbuild_trigger" "build_pipeline_image" {
   description = "Builds the QuantServe pipeline Docker image"
   project     = var.project_id
   location    = var.region
-  service_account = "projects/${var.project_id}/serviceAccounts/${data.google_project.current.number}@cloudbuild.gserviceaccount.com"
+  service_account = "projects/${var.project_id}/serviceAccounts/${data.google_project.current.number}-compute@developer.gserviceaccount.com"
 
   repository_event_config {
     repository = google_cloudbuildv2_repository.quantserve.id
@@ -76,7 +76,7 @@ resource "google_cloudbuild_trigger" "model_onboarding" {
   description = "Runs the full model onboarding pipeline when a model config changes"
   project     = var.project_id
   location    = var.region
-  service_account = "projects/${var.project_id}/serviceAccounts/${data.google_project.current.number}@cloudbuild.gserviceaccount.com"
+  service_account = "projects/${var.project_id}/serviceAccounts/${data.google_project.current.number}-compute@developer.gserviceaccount.com"
 
   repository_event_config {
     repository = google_cloudbuildv2_repository.quantserve.id
@@ -107,7 +107,7 @@ resource "google_cloudbuild_trigger" "build_serving_image" {
   description = "Builds the QuantServe vLLM serving Docker image"
   project     = var.project_id
   location    = var.region
-  service_account = "projects/${var.project_id}/serviceAccounts/${data.google_project.current.number}@cloudbuild.gserviceaccount.com"
+  service_account = "projects/${var.project_id}/serviceAccounts/${data.google_project.current.number}-compute@developer.gserviceaccount.com"
 
   repository_event_config {
     repository = google_cloudbuildv2_repository.quantserve.id

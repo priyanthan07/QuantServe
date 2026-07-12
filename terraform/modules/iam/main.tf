@@ -173,6 +173,12 @@ resource "google_project_iam_member" "cloudbuild_compute_admin" {
   member  = local.cloudbuild_sa
 }
 
+resource "google_project_iam_member" "cloudbuild_compute_default_builder" {
+  project = var.project_id
+  role    = "roles/cloudbuild.builds.builder"
+  member  = "serviceAccount:${data.google_project.project.number}-compute@developer.gserviceaccount.com"
+}
+
 # Cloud Build needs to attach the pipeline service account to the GPU VM
 resource "google_project_iam_member" "cloudbuild_sa_user" {
   project = var.project_id
