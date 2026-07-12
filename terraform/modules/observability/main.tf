@@ -53,9 +53,11 @@ scrape_configs:
       - project: ${var.project_id}
         zone: ${var.zone}
         port: 8000
-        filter: '(tags.items = "vllm-serving")'
         refresh_interval: 30s
     relabel_configs:
+      - source_labels: [__meta_gce_tags]
+        regex: '.*vllm-serving.*'
+        action: keep
       - source_labels: [__meta_gce_instance_name]
         target_label: instance_name
       - source_labels: [__meta_gce_metadata_model_id]
