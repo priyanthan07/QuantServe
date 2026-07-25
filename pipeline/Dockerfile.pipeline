@@ -1,3 +1,5 @@
+# Serving image: vLLM + LMCache for inference
+
 FROM nvidia/cuda:12.4.1-devel-ubuntu22.04
 
 ENV DEBIAN_FRONTEND=noninteractive
