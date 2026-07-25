@@ -56,7 +56,7 @@ resource "google_cloudbuild_trigger" "build_pipeline_image" {
         "-t", "${var.region}-docker.pkg.dev/${var.project_id}/quantserve/pipeline:$COMMIT_SHA",
         "-t", "${var.region}-docker.pkg.dev/${var.project_id}/quantserve/pipeline:latest",
         "-f", "pipeline/Dockerfile.pipeline",
-        ".",
+        "pipeline/",
       ]
     }
 
