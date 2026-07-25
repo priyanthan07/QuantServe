@@ -7,14 +7,14 @@ import json
 import os
 import subprocess
 import time
-
+import sys
 import yaml
 
 
 def start_vllm_server(model_path: str, extra_args: str) -> subprocess.Popen:
     """Start a vLLM server in the background and wait for it to be ready."""
     cmd = [
-        "python", "-m", "vllm.entrypoints.openai.api_server",
+        sys.executable, "-m", "vllm.entrypoints.openai.api_server",
         "--model", model_path,
         "--host", "0.0.0.0",
         "--port", "8000",
@@ -46,8 +46,9 @@ def start_vllm_server(model_path: str, extra_args: str) -> subprocess.Popen:
 
 
 def run_guidellm(model_path: str, output_path: str):
+    guidellm_bin = os.path.join(os.path.dirname(sys.executable), "guidellm")
     cmd = [
-        "guidellm", "run",
+        guidellm_bin, "run",
         "--backend", f"kind=openai_http,target=http://localhost:8000,model={model_path}",
         "--profile", "kind=sweep",
         "--constraint", "kind=max_duration,seconds=120",

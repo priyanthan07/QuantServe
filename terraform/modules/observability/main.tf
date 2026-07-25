@@ -203,6 +203,8 @@ DASHEOF
         sleep 5
       done
 
+      docker rm -f prometheus grafana 2>/dev/null || true
+
       # ---------- Start Prometheus ----------
       docker run -d \
         --name prometheus \

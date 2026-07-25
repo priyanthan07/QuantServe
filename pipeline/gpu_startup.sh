@@ -78,34 +78,34 @@ docker run --rm --gpus all \
   -e GOOGLE_CLOUD_PROJECT="${PROJECT_ID}" \
   -e HF_TOKEN="${HF_TOKEN}" \
   "${ARTIFACT_REPO}:latest" \
-  python3 scripts/download_model.py \
+  /opt/venv-quant/bin/python3 scripts/download_model.py \
     --config /tmp/quantserve/model_config.yaml \
     --bucket "${BASE_BUCKET}"
 
 # Step 2: Quantize
 echo "[gpu_startup] Running: quantize_model"
-$DOCKER_RUN python3 scripts/quantize_model.py \
+$DOCKER_RUN /opt/venv-quant/bin/python3 scripts/quantize_model.py \
   --config /tmp/quantserve/model_config.yaml \
   --base-bucket "${BASE_BUCKET}" \
   --quant-bucket "${QUANT_BUCKET}"
 
 # Step 3: Evaluate with lm_eval
 echo "[gpu_startup] Running: evaluate_model"
-$DOCKER_RUN python3 scripts/evaluate_model.py \
+$DOCKER_RUN /opt/venv-quant/bin/python3 scripts/evaluate_model.py \
   --config /tmp/quantserve/model_config.yaml \
   --quant-bucket "${QUANT_BUCKET}" \
   --eval-bucket "${EVAL_BUCKET}"
 
 # Step 4: Benchmark with GuideLLM
 echo "[gpu_startup] Running: benchmark_model"
-$DOCKER_RUN python3 scripts/benchmark_model.py \
+$DOCKER_RUN /opt/venv-serve/bin/python3 scripts/benchmark_model.py \
   --config /tmp/quantserve/model_config.yaml \
   --quant-bucket "${QUANT_BUCKET}" \
   --eval-bucket "${EVAL_BUCKET}"
 
 # Step 5: Update model registry
 echo "[gpu_startup] Running: update_registry"
-$DOCKER_RUN python3 scripts/update_registry.py \
+$DOCKER_RUN /opt/venv-quant/bin/python3 scripts/update_registry.py \
   --config /tmp/quantserve/model_config.yaml \
   --eval-bucket "${EVAL_BUCKET}" \
   --registry-bucket "${REG_BUCKET}"

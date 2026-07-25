@@ -16,15 +16,22 @@ RUN curl -faSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key a
     apt-get install -y --no-install-recommends google-cloud-cli && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Python dependencies for the full pipeline
-RUN pip install --no-cache-dir --break-system-packages \
+# --- venv-quant: quantization + evaluation ---
+RUN python3 -m venv /opt/venv-quant && \
+    /opt/venv-quant/bin/pip install --no-cache-dir \
     torch==2.11.0 \
     llmcompressor==0.12.0 \
     lm_eval==0.4.12 \
+    google-cloud-storage==2.18.2 \
+    google-cloud-secret-manager==2.20.2 \
+    pyyaml==6.0.2
+
+# --- venv-serve: vLLM server + GuideLLM benchmark ---
+RUN python3 -m venv /opt/venv-serve && \
+    /opt/venv-serve/bin/pip install --no-cache-dir \
     vllm==0.22.1 \
     guidellm==0.7.0 \
     google-cloud-storage==2.18.2 \
-    google-cloud-secret-manager==2.20.2 \
     pyyaml==6.0.2 \
     openai==2.43.0
 

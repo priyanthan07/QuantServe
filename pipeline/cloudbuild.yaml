@@ -79,7 +79,7 @@ steps:
     args:
       - '-c'
       - |
-        python3 /opt/quantserve/scripts/download_model.py \
+        /opt/venv-quant/bin/python3 /opt/quantserve/scripts/download_model.py \
           --config "$(cat /workspace/model_config_path.txt)" \
           --bucket "${_BASE_BUCKET}"
     secretEnv: ['HF_TOKEN']
@@ -136,14 +136,14 @@ steps:
   - id: 'wait-gpu-pipeline'
     name: 'gcr.io/cloud-builders/gcloud'
     entrypoint: bash
-    timeout: '6000s'
+    timeout: '14400s'
     args:
       - '-c'
       - |
         COMPLETE_FLAG="gs://${_EVAL_BUCKET}/_pipeline_flags/${BUILD_ID}/COMPLETE"
         FAILURE_FLAG="gs://${_EVAL_BUCKET}/_pipeline_flags/${BUILD_ID}/FAILED"
         echo "Waiting for GPU pipeline (build ${BUILD_ID})..."
-        for i in $(seq 1 120); do
+        for i in $(seq 1 200); do
           sleep 30
           if gcloud storage ls "${COMPLETE_FLAG}" 2>/dev/null; then
             echo "GPU pipeline complete."
