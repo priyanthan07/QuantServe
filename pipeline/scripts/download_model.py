@@ -58,6 +58,8 @@ def download_and_upload(model_id: str, commit_hash: str, bucket_name: str):
             
 
 def main():
+    os.makedirs("/tmp/quantserve", exist_ok=True)
+    
     parser = argparse.ArgumentParser()
     parser.add_argument("--config", required=True, help="Path to model config YAML")
     parser.add_argument("--bucket", required=True, help="GCS bucket for base models")

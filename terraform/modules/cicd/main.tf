@@ -45,6 +45,9 @@ resource "google_cloudbuild_trigger" "build_pipeline_image" {
   ]
 
   build {
+    options {
+      logging = "CLOUD_LOGGING_ONLY"
+    }
     step {
       name = "gcr.io/cloud-builders/docker"
       args = [
@@ -122,6 +125,9 @@ resource "google_cloudbuild_trigger" "build_serving_image" {
   ]
 
   build {
+    options {
+      logging = "CLOUD_LOGGING_ONLY"
+    }
     step {
       name = "gcr.io/cloud-builders/docker"
       args = [

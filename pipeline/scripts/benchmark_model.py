@@ -11,12 +11,11 @@ import time
 import yaml
 
 
-def start_vllm_server(model_path: str, model_name: str, extra_args: str) -> subprocess.Popen:
+def start_vllm_server(model_path: str, extra_args: str) -> subprocess.Popen:
     """Start a vLLM server in the background and wait for it to be ready."""
     cmd = [
         "python", "-m", "vllm.entrypoints.openai.api_server",
         "--model", model_path,
-        "--served-model-name", model_name,
         "--host", "0.0.0.0",
         "--port", "8000",
         "--dtype", "auto",
@@ -46,21 +45,16 @@ def start_vllm_server(model_path: str, model_name: str, extra_args: str) -> subp
     raise TimeoutError("vLLM server did not become ready within 5 minutes")
 
 
-def run_guidellm(model_name: str, output_path: str):
-    """Run GuideLLM benchmark sweep against the local vLLM server."""
+def run_guidellm(model_path: str, output_path: str):
     cmd = [
-        "guidellm",
-        "--target", "http://localhost:8000",
-        "--model", model_name,
-        "--profile", "sweep",
-        "--max-seconds", "120",
+        "guidellm", "run",
+        "--backend", f"kind=openai_http,target=http://localhost:8000,model={model_path}",
+        "--profile", "kind=sweep",
+        "--constraint", "kind=max_duration,seconds=120",
         "--data", "kind=synthetic_text,prompt_tokens=256,output_tokens=128",
-        "--output-path", output_path,
+        "--output", f"kind=json,path={output_path}",
     ]
-
-    print(f"Running GuideLLM: {' '.join(cmd)}")
     subprocess.run(cmd, check=True)
-    print(f"GuideLLM results written to {output_path}")
 
 
 def upload_results(local_path: str, bucket: str, prefix: str):
@@ -99,11 +93,11 @@ def main():
     output_path = "/tmp/guidellm_results.json"
 
     # Start vLLM server
-    vllm_proc = start_vllm_server(model_path, model_name, vllm_args)
+    vllm_proc = start_vllm_server(model_path, vllm_args)
 
     try:
         # Run GuideLLM
-        run_guidellm(model_name, output_path)
+        run_guidellm(model_path, output_path)
 
         # Upload results
         upload_results(output_path, args.eval_bucket, eval_prefix)

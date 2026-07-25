@@ -48,7 +48,7 @@ def extract_scores(eval_results: dict) -> dict:
     lm_eval_data = eval_results.get("lm_eval", {}).get("results", {})
     
     for task_name, task_data in lm_eval_data.items():
-        for key in ["acc,none", "acc_norm,none"]:
+        for key in ["acc,none", "acc_norm,none", "exact_match,strict-match", "exact_match,flexible-extract"]:
             if key in task_data:
                 scores[task_name] = round(task_data[key], 4)
                 break

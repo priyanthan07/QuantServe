@@ -44,6 +44,8 @@ cleanup() {
 }
 trap cleanup EXIT
 
+gcloud auth configure-docker "${ARTIFACT_REPO%%/*}" --quiet
+
 # ---------- Install pipeline dependencies ----------
 echo "[gpu_startup] Pulling pipeline image"
 docker pull "${ARTIFACT_REPO}:latest"

@@ -136,7 +136,7 @@ data "google_project" "project" {
 
 locals {
   # Cloud Build's default service account
-  cloudbuild_sa = "serviceAccount:${data.google_project.project.number}@cloudbuild.gserviceaccount.com"
+  cloudbuild_sa = "serviceAccount:${data.google_project.project.number}-compute@developer.gserviceaccount.com"
 }
 
 # ---------- Cloud Build IAM ----------
@@ -184,4 +184,22 @@ resource "google_project_iam_member" "cloudbuild_sa_user" {
   project = var.project_id
   role    = "roles/iam.serviceAccountUser"
   member  = local.cloudbuild_sa
+}
+
+resource "google_service_account_iam_member" "cloudbuild_act_as_pipeline" {
+  service_account_id = google_service_account.pipeline.name
+  role               = "roles/iam.serviceAccountUser"
+  member             = local.cloudbuild_sa
+}
+
+resource "google_project_iam_member" "pipeline_ar_reader" {
+  project = var.project_id
+  role    = "roles/artifactregistry.reader"
+  member  = "serviceAccount:${google_service_account.pipeline.email}"
+}
+
+resource "google_project_iam_member" "serving_ar_reader" {
+  project = var.project_id
+  role    = "roles/artifactregistry.reader"
+  member  = "serviceAccount:${google_service_account.serving.email}"
 }

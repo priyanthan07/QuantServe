@@ -42,7 +42,7 @@ def check_thresholds(results: dict, thresholds: dict) -> list[dict]:
         # Common patterns: acc,none / acc_norm,none
         task_results = results["results"][benchmark]
         score = None
-        for key in ["acc,none", "acc_norm,none"]:
+        for key in ["acc,none", "acc_norm,none", "exact_match,strict-match", "exact_match,flexible-extract"]:
             if key in task_results:
                 score = task_results[key]
                 break

@@ -38,8 +38,15 @@ steps:
         changed = [f for f in result.stdout.strip().split("\n") if f.startswith("model-configs/") and f.endswith(".yaml")]
 
         if not changed:
-            print("No model config changed in this commit — nothing to do.")
-            sys.exit(0)
+          import glob
+          all_configs = sorted(glob.glob("model-configs/*.yaml"))
+          if len(all_configs) == 1:
+              print(f"No config changed in this commit; falling back to the only config: {all_configs[0]}")
+              changed = all_configs
+          else:
+              print("ERROR: No model config changed and fallback is ambiguous "
+                    f"({len(all_configs)} configs exist). Commit a change to exactly one config.")
+              sys.exit(1)
 
         if len(changed) > 1:
             print(f"ERROR: Multiple model configs changed in one commit: {changed}")
@@ -72,7 +79,7 @@ steps:
     args:
       - '-c'
       - |
-        python3 scripts/download_model.py \
+        python3 /opt/quantserve/scripts/download_model.py \
           --config "$(cat /workspace/model_config_path.txt)" \
           --bucket "${_BASE_BUCKET}"
     secretEnv: ['HF_TOKEN']
