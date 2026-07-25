@@ -93,8 +93,8 @@ steps:
       - |
         CONFIG_PATH=$(cat /workspace/model_config_path.txt)
         GCS_CONFIG_PATH="gs://${_EVAL_BUCKET}/_pipeline_configs/${BUILD_ID}/model_config.yaml"
-        gcloud storage cp "${CONFIG_PATH}" "${GCS_CONFIG_PATH}"
-        echo "${GCS_CONFIG_PATH}" > /workspace/gcs_config_path.txt
+        gcloud storage cp "$${CONFIG_PATH}" "$${GCS_CONFIG_PATH}"
+        echo "$${GCS_CONFIG_PATH}" > /workspace/gcs_config_path.txt
 
   # Step 4: Provision L4 Spot VM for GPU pipeline
   - id: 'provision-gpu-vm'
@@ -104,8 +104,8 @@ steps:
       - '-c'
       - |
         VM_NAME="quantserve-pipeline-${BUILD_ID:0:8}"
-        echo "${VM_NAME}" > /workspace/gpu_vm_name.txt
-        gcloud compute instances create "${VM_NAME}" \
+        echo "$${VM_NAME}" > /workspace/gpu_vm_name.txt
+        gcloud compute instances create "$${VM_NAME}" \
           --project="$PROJECT_ID" \
           --zone="${_ZONE}" \
           --machine-type="g2-standard-4" \
@@ -145,15 +145,15 @@ steps:
         echo "Waiting for GPU pipeline (build ${BUILD_ID})..."
         for i in $(seq 1 200); do
           sleep 30
-          if gcloud storage ls "${COMPLETE_FLAG}" 2>/dev/null; then
+          if gcloud storage ls "$${COMPLETE_FLAG}" 2>/dev/null; then
             echo "GPU pipeline complete."
             exit 0
           fi
-          if gcloud storage ls "${FAILURE_FLAG}" 2>/dev/null; then
+          if gcloud storage ls "$${FAILURE_FLAG}" 2>/dev/null; then
             echo "GPU pipeline FAILED."
             exit 1
           fi
-          echo "  Still waiting... (${i}/120)"
+          echo "  Still waiting... ($${i}/120)"
         done
         echo "Timeout waiting for GPU pipeline."
         exit 1
