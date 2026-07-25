@@ -48,6 +48,7 @@ resource "google_cloudbuild_trigger" "build_pipeline_image" {
     options {
       logging = "CLOUD_LOGGING_ONLY"
     }
+    timeout = "3600s"
     step {
       name = "gcr.io/cloud-builders/docker"
       args = [
@@ -128,6 +129,7 @@ resource "google_cloudbuild_trigger" "build_serving_image" {
     options {
       logging = "CLOUD_LOGGING_ONLY"
     }
+    timeout = "3600s"
     step {
       name = "gcr.io/cloud-builders/docker"
       args = [

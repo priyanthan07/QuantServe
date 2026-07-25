@@ -1,5 +1,3 @@
-# Pipeline image: venv-quant + venv-serve for model onboarding
-
 FROM vllm/vllm-openai:v0.22.1
 
 # LMCache for cross-replica KV cache sharing
