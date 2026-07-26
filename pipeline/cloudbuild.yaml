@@ -125,15 +125,15 @@ steps:
             --scopes="cloud-platform" \
             --maintenance-policy=TERMINATE \
             --metadata=\
-              model_config_gcs=$(cat /workspace/gcs_config_path.txt),\
-              base_bucket=${_BASE_BUCKET},\
-              quant_bucket=${_QUANT_BUCKET},\
-              eval_bucket=${_EVAL_BUCKET},\
-              reg_bucket=${_REG_BUCKET},\
-              build_id=${BUILD_ID},\
-              zone=$${ZONE},\
-              project_id=$PROJECT_ID,\
-              artifact_repo=${_ARTIFACT_REPO} \
+        model_config_gcs=$(cat /workspace/gcs_config_path.txt),\
+        base_bucket=${_BASE_BUCKET},\
+        quant_bucket=${_QUANT_BUCKET},\
+        eval_bucket=${_EVAL_BUCKET},\
+        reg_bucket=${_REG_BUCKET},\
+        build_id=${BUILD_ID},\
+        zone=$${ZONE},\
+        project_id=$PROJECT_ID,\
+        artifact_repo=${_ARTIFACT_REPO} \
             --metadata-from-file=startup-script=pipeline/gpu_startup.sh 2>&1; then
               echo "VM created in $${ZONE}"
               echo "$${ZONE}" > /workspace/gpu_vm_zone.txt
