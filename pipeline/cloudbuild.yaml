@@ -108,7 +108,7 @@ steps:
         gcloud compute instances create "$${VM_NAME}" \
           --project="$PROJECT_ID" \
           --zone="${_ZONE}" \
-          --machine-type="g2-standard-4" \
+          --machine-type="g2-standard-8" \
           --accelerator="type=nvidia-l4,count=1" \
           --provisioning-model=SPOT \
           --image-family="common-cu129-ubuntu-2404-nvidia-580" \
