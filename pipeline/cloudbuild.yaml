@@ -103,7 +103,7 @@ steps:
     args:
       - '-c'
       - |
-        VM_NAME="quantserve-pipeline-${BUILD_ID:0:8}"
+        VM_NAME="quantserve-pipeline-$(echo ${BUILD_ID} | cut -c1-8)"
         echo "$${VM_NAME}" > /workspace/gpu_vm_name.txt
         gcloud compute instances create "$${VM_NAME}" \
           --project="$PROJECT_ID" \
