@@ -84,6 +84,8 @@ DOCKER_RUN="docker run --rm --gpus all \
   -e QUANT_BUCKET=${QUANT_BUCKET} \
   -e EVAL_BUCKET=${EVAL_BUCKET} \
   -e GOOGLE_CLOUD_PROJECT=${PROJECT_ID} \
+  -e TQDM_DISABLE=1 \
+  -e HF_HUB_DISABLE_PROGRESS_BARS=1 \
   ${ARTIFACT_REPO}:latest"
 
 # Step 1: Download base model (if not already in GCS)
@@ -98,6 +100,8 @@ docker run --rm --gpus all \
   -e QUANT_BUCKET="${QUANT_BUCKET}" \
   -e EVAL_BUCKET="${EVAL_BUCKET}" \
   -e GOOGLE_CLOUD_PROJECT="${PROJECT_ID}" \
+  -e TQDM_DISABLE=1 \
+  -e HF_HUB_DISABLE_PROGRESS_BARS=1 \
   -e HF_TOKEN="${HF_TOKEN}" \
   "${ARTIFACT_REPO}:latest" \
   /opt/venv-quant/bin/python3 scripts/download_model.py \
