@@ -29,6 +29,9 @@ FAILURE_FLAG="gs://${EVAL_BUCKET}/_pipeline_flags/${BUILD_ID}/FAILED"
 echo "[gpu_startup] Starting GPU pipeline for build ${BUILD_ID}"
 
 # ---------- Self-cleanup on exit ----------
+# Set this FIRST so any failure below (including Docker install)
+# writes the FAILED flag to GCS and Cloud Build's wait loop sees it
+# immediately, rather than polling for hours with no signal.
 cleanup() {
   EXIT_CODE=$?
   if [ $EXIT_CODE -ne 0 ]; then
@@ -43,6 +46,34 @@ cleanup() {
     --quiet || true
 }
 trap cleanup EXIT
+
+# ---------- Install Docker + NVIDIA Container Toolkit ----------
+# The DLVM image ships with NVIDIA GPU drivers and CUDA pre-installed,
+# but does NOT include Docker. We need two things:
+#   1. Docker Engine    — to pull and run our pipeline container image
+#   2. NVIDIA Container Toolkit — the bridge that lets Docker containers
+#      access the host GPU (required for the --gpus all flag)
+
+echo "[gpu_startup] Installing Docker..."
+apt-get update -qq
+apt-get install -y -qq docker.io
+systemctl start docker
+systemctl enable docker
+
+echo "[gpu_startup] Installing NVIDIA Container Toolkit..."
+curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey \
+  | gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg
+curl -s -L https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list \
+  | sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' \
+  | tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
+apt-get update -qq
+apt-get install -y -qq nvidia-container-toolkit
+
+# Register the NVIDIA runtime with Docker so --gpus all works
+nvidia-ctk runtime configure --runtime=docker
+systemctl restart docker
+
+echo "[gpu_startup] Docker + NVIDIA runtime ready"
 
 gcloud auth configure-docker "${ARTIFACT_REPO%%/*}" --quiet
 
