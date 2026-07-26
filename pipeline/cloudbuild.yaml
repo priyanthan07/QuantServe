@@ -107,7 +107,7 @@ steps:
         echo "$${VM_NAME}" > /workspace/gpu_vm_name.txt
         gcloud compute instances create "$${VM_NAME}" \
           --project="$PROJECT_ID" \
-          --zone="us-central1-c" \
+          --zone="us-central1-b" \
           --machine-type="g2-standard-8" \
           --accelerator="type=nvidia-l4,count=1" \
           --provisioning-model=STANDARD \
@@ -127,7 +127,7 @@ steps:
         eval_bucket=${_EVAL_BUCKET},\
         reg_bucket=${_REG_BUCKET},\
         build_id=${BUILD_ID},\
-        zone=us-central1-c,\
+        zone=us-central1-b,\
         project_id=$PROJECT_ID,\
         artifact_repo=${_ARTIFACT_REPO} \
           --metadata-from-file=startup-script=pipeline/gpu_startup.sh
