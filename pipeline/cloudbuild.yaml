@@ -105,32 +105,49 @@ steps:
       - |
         VM_NAME="quantserve-pipeline-$(echo ${BUILD_ID} | cut -c1-8)"
         echo "$${VM_NAME}" > /workspace/gpu_vm_name.txt
-        gcloud compute instances create "$${VM_NAME}" \
-          --project="$PROJECT_ID" \
-          --zone="us-central1-c" \
-          --machine-type="g2-standard-8" \
-          --accelerator="type=nvidia-l4,count=1" \
-          --provisioning-model=STANDARD \
-          --image-family="common-cu129-ubuntu-2404-nvidia-580" \
-          --image-project="deeplearning-platform-release" \
-          --boot-disk-size="200GB" \
-          --boot-disk-type="pd-ssd" \
-          --no-address \
-          --subnet="quantserve-pipeline-${_ENVIRONMENT}" \
-          --service-account="${_PIPELINE_SA}" \
-          --scopes="cloud-platform" \
-          --maintenance-policy=TERMINATE \
-          --metadata=\
-        model_config_gcs=$(cat /workspace/gcs_config_path.txt),\
-        base_bucket=${_BASE_BUCKET},\
-        quant_bucket=${_QUANT_BUCKET},\
-        eval_bucket=${_EVAL_BUCKET},\
-        reg_bucket=${_REG_BUCKET},\
-        build_id=${BUILD_ID},\
-        zone=us-central1-c,\
-        project_id=$PROJECT_ID,\
-        artifact_repo=${_ARTIFACT_REPO} \
-          --metadata-from-file=startup-script=pipeline/gpu_startup.sh
+
+        CREATED=false
+        for ZONE in us-central1-c us-central1-b us-central1-a; do
+          echo "Trying zone $${ZONE}..."
+          if gcloud compute instances create "$${VM_NAME}" \
+            --project="$PROJECT_ID" \
+            --zone="$${ZONE}" \
+            --machine-type=g2-standard-8 \
+            --accelerator="type=nvidia-l4,count=1" \
+            --provisioning-model=SPOT \
+            --image-family="common-cu129-ubuntu-2404-nvidia-580" \
+            --image-project="deeplearning-platform-release" \
+            --boot-disk-size="200GB" \
+            --boot-disk-type="pd-ssd" \
+            --no-address \
+            --subnet="quantserve-pipeline-${_ENVIRONMENT}" \
+            --service-account="${_PIPELINE_SA}" \
+            --scopes="cloud-platform" \
+            --maintenance-policy=TERMINATE \
+            --metadata=\
+              model_config_gcs=$(cat /workspace/gcs_config_path.txt),\
+              base_bucket=${_BASE_BUCKET},\
+              quant_bucket=${_QUANT_BUCKET},\
+              eval_bucket=${_EVAL_BUCKET},\
+              reg_bucket=${_REG_BUCKET},\
+              build_id=${BUILD_ID},\
+              zone=$${ZONE},\
+              project_id=$PROJECT_ID,\
+              artifact_repo=${_ARTIFACT_REPO} \
+            --metadata-from-file=startup-script=pipeline/gpu_startup.sh 2>&1; then
+              echo "VM created in $${ZONE}"
+              echo "$${ZONE}" > /workspace/gpu_vm_zone.txt
+              CREATED=true
+              break
+          else
+              echo "Zone $${ZONE} unavailable, trying next..."
+          fi
+        done
+
+        if [ "$${CREATED}" != "true" ]; then
+          echo "ERROR: No zone has L4 capacity. Retry later."
+          exit 1
+        fi
 
   # Step 5: Wait for GPU pipeline to complete (poll GCS flag)
   - id: 'wait-gpu-pipeline'
