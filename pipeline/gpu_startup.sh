@@ -56,12 +56,12 @@ trap cleanup EXIT
 
 echo "[gpu_startup] Installing Docker..."
 apt-get update -qq
-apt-get install -y -qq docker.io
+apt-get install -y -qq docker.io nvidia-container-toolkit
 systemctl start docker
 systemctl enable docker
 
 # Register the NVIDIA runtime with Docker so --gpus all works
-nvidia-ctk runtime configure --runtime=docker
+nvidia-ctk runtime configure --runtime=docker --set-as-default
 systemctl restart docker
 
 echo "[gpu_startup] Docker + NVIDIA runtime ready"
