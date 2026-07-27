@@ -1,6 +1,15 @@
 #!/bin/bash
 set -euo pipefail
 
+# ---------- Install Docker + NVIDIA Container Toolkit ----------
+# The DLVM image has GPU drivers but no Docker
+apt-get update -qq
+apt-get install -y -qq docker.io
+systemctl start docker
+apt-get install -y -qq nvidia-container-toolkit || true
+nvidia-ctk runtime configure --runtime=docker --set-as-default
+systemctl restart docker
+
 # ---------- Configuration ----------
 # These values are injected by Terraform templatefile().
 BUCKET="${quantized_models_bucket}"
