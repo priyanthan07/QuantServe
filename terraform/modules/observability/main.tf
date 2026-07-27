@@ -118,7 +118,7 @@ datasources:
   - name: Prometheus
     type: prometheus
     access: proxy
-    url: http://localhost:9090
+    url: http://prometheus:9090
     isDefault: true
     editable: false
 DSEOF
@@ -204,10 +204,12 @@ DASHEOF
       done
 
       docker rm -f prometheus grafana 2>/dev/null || true
+      docker network create quantserve 2>/dev/null || true
 
       # ---------- Start Prometheus ----------
       docker run -d \
         --name prometheus \
+        --network quantserve \
         --restart always \
         -p 9090:9090 \
         -v /home/prometheus/config:/etc/prometheus \
@@ -224,6 +226,7 @@ DASHEOF
 
       docker run -d \
         --name grafana \
+        --network quantserve \
         --restart always \
         -p 3000:3000 \
         -v /home/grafana/data:/var/lib/grafana \
