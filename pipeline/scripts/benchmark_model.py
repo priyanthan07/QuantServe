@@ -42,6 +42,8 @@ def start_vllm_server(model_path: str, extra_args: str) -> subprocess.Popen:
         time.sleep(5)
 
     proc.terminate()
+    stderr_output = proc.stderr.read().decode() if proc.stderr else ""
+    print(f"vLLM stderr:\n{stderr_output[-2000:]}")
     raise TimeoutError("vLLM server did not become ready within 5 minutes")
 
 
