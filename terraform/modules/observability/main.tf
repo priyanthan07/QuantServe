@@ -188,6 +188,23 @@ DBEOF
               "type": "timeseries",
               "gridPos": {"h": 8, "w": 8, "x": 16, "y": 16},
               "targets": [{"expr": "rate(vllm:generation_tokens_total[1m])", "legendFormat": "{{ model_id }} — {{ instance_name }}"}]
+          },
+          {
+              "title": "Cost per 1K Tokens (USD)",
+              "type": "stat",
+              "gridPos": {"h": 8, "w": 12, "x": 0, "y": 24},
+              "targets": [{"expr": "${var.gpu_hourly_cost} / (3600 * (rate(vllm:prompt_tokens_total[5m]) + rate(vllm:generation_tokens_total[5m]))) * 1000", "legendFormat": "$/1K tokens"}],
+              "fieldConfig": {"defaults": {"unit": "currencyUSD", "decimals": 4, "thresholds": {"steps": [{"color": "green", "value": 0}, {"color": "yellow", "value": 0.01}, {"color": "red", "value": 0.05}]}}}
+          },
+          {
+              "title": "Total Tokens Served",
+              "type": "stat",
+              "gridPos": {"h": 8, "w": 12, "x": 12, "y": 24},
+              "targets": [
+                  {"expr": "vllm:prompt_tokens_total", "legendFormat": "Prompt tokens"},
+                  {"expr": "vllm:generation_tokens_total", "legendFormat": "Generation tokens"}
+              ],
+              "fieldConfig": {"defaults": {"unit": "short", "decimals": 0}}
           }
       ]
     

@@ -141,7 +141,7 @@ module "observability" {
   ttft_p99_slo_seconds             = var.ttft_p99_slo_seconds
   domain_suffix                    = var.domain_suffix
   grafana_admin_password_secret_id = module.secrets.grafana_admin_password_secret_id
-
+  gpu_hourly_cost = 0.71
   depends_on = [module.apis]
 }
 

@@ -62,6 +62,6 @@ exec docker run --rm --gpus all \
     --dtype auto \
     --trust-remote-code \
     --api-key "$${VLLM_API_KEY}" \
-    --kv-transfer-config '{"kv_connector":"LMCacheConnectorV1","kv_role":"kv_both","kv_connector_extra_config":{"lmcache.chunk_size":256,"lmcache.max_local_cpu_size":5}}' \
+    # --kv-transfer-config '{"kv_connector":"LMCacheConnectorV1","kv_role":"kv_both","kv_connector_extra_config":{"lmcache.chunk_size":256,"lmcache.max_local_cpu_size":5}}' \
     $${VLLM_EXTRA_ARGS}
   

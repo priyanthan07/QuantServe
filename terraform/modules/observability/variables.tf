@@ -46,3 +46,9 @@ variable "grafana_admin_password_secret_id" {
   description = "Secret Manager secret ID for the Grafana admin password"
   type        = string
 }
+
+variable "gpu_hourly_cost" {
+  description = "Hourly cost of one serving GPU VM (USD) for cost-per-token calculation"
+  type        = number
+  default     = 0.71
+}
