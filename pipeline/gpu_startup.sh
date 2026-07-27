@@ -56,11 +56,14 @@ trap cleanup EXIT
 
 echo "[gpu_startup] Installing Docker..."
 apt-get update -qq
-apt-get install -y -qq docker.io nvidia-container-toolkit
+apt-get install -y -qq docker.io
 systemctl start docker
 systemctl enable docker
 
-# Register the NVIDIA runtime with Docker so --gpus all works
+echo "[gpu_startup] Installing NVIDIA Container Toolkit..."
+apt-get install -y -qq nvidia-container-toolkit || true
+
+# Configure regardless — nvidia-ctk exists on the DLVM even if apt says "held"
 nvidia-ctk runtime configure --runtime=docker --set-as-default
 systemctl restart docker
 
