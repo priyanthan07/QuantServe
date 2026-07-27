@@ -6,7 +6,7 @@ quantization_scheme: "W4A16"
 recipe: "GPTQModifier"
 calibration_dataset: "wikitext"
 calibration_dataset_config: "wikitext-2-raw-v1"
-num_calibration_samples: 256
+num_calibration_samples: 128
 max_seq_length: 4096
 
 # Evaluation benchmarks (must be valid lm_eval task names)
