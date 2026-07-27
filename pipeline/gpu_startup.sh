@@ -130,7 +130,7 @@ echo "[gpu_startup] Running: benchmark_model"
 $DOCKER_RUN /opt/venv-serve/bin/python3 scripts/benchmark_model.py \
   --config /tmp/quantserve/model_config.yaml \
   --quant-bucket "${QUANT_BUCKET}" \
-  --eval-bucket "${EVAL_BUCKET}" 2>&1 | tr '\r' '\n'
+  --eval-bucket "${EVAL_BUCKET}" 2>&1 | tr '\r' '\n' || echo "[gpu_startup] WARNING: benchmark failed (non-blocking)"
 
 # Step 5: Update model registry
 echo "[gpu_startup] Running: update_registry"

@@ -31,7 +31,7 @@ RUN python3 -m venv /opt/venv-quant && \
 # --- venv-serve: vLLM server + GuideLLM benchmark ---
 RUN python3 -m venv /opt/venv-serve && \
     /opt/venv-serve/bin/pip install --no-cache-dir \
-    vllm==0.22.1 \
+    vllm==0.23.0 \
     guidellm==0.7.0 \
     google-cloud-storage==2.18.2 \
     pyyaml==6.0.2 \
