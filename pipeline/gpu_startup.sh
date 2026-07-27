@@ -64,6 +64,23 @@ systemctl enable docker
 nvidia-ctk runtime configure --runtime=docker
 systemctl restart docker
 
+# Verify GPU is accessible inside Docker
+echo "[gpu_startup] Verifying GPU access in Docker..."
+if ! docker run --rm --gpus all ${ARTIFACT_REPO}:latest nvidia-smi > /dev/null 2>&1; then
+    echo "[gpu_startup] GPU not accessible, reconfiguring runtime..."
+    nvidia-ctk runtime configure --runtime=docker --set-as-default
+    systemctl restart docker
+    if ! docker run --rm --gpus all ${ARTIFACT_REPO}:latest nvidia-smi > /dev/null 2>&1; then
+        echo "[gpu_startup] GPU still not accessible, trying cdi generation..."
+        nvidia-ctk cdi generate --output=/etc/cdi/nvidia.yaml
+        if ! docker run --rm --gpus all ${ARTIFACT_REPO}:latest nvidia-smi > /dev/null 2>&1; then
+            echo "[gpu_startup] ERROR: Cannot access GPU from Docker after all attempts"
+            exit 1
+        fi
+    fi
+fi
+echo "[gpu_startup] GPU verified in Docker"
+
 echo "[gpu_startup] Docker + NVIDIA runtime ready"
 
 gcloud auth configure-docker "${ARTIFACT_REPO%%/*}" --quiet
