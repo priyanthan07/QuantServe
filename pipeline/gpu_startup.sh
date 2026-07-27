@@ -73,7 +73,7 @@ gcloud auth configure-docker "${ARTIFACT_REPO%%/*}" --quiet
 
 # ---------- Install pipeline dependencies ----------
 echo "[gpu_startup] Pulling pipeline image"
-docker pull "${ARTIFACT_REPO}:latest"
+docker pull "${ARTIFACT_REPO}:latest" 2>&1 | tr '\r' '\n'
 
 # ---------- Download model config from GCS ----------
 echo "[gpu_startup] Downloading model config"
@@ -109,35 +109,35 @@ docker run --rm --gpus all \
   "${ARTIFACT_REPO}:latest" \
   /opt/venv-quant/bin/python3 scripts/download_model.py \
     --config /tmp/quantserve/model_config.yaml \
-    --bucket "${BASE_BUCKET}"
+    --bucket "${BASE_BUCKET}" 2>&1 | tr '\r' '\n'
 
 # Step 2: Quantize
 echo "[gpu_startup] Running: quantize_model"
 $DOCKER_RUN /opt/venv-quant/bin/python3 scripts/quantize_model.py \
   --config /tmp/quantserve/model_config.yaml \
   --base-bucket "${BASE_BUCKET}" \
-  --quant-bucket "${QUANT_BUCKET}"
+  --quant-bucket "${QUANT_BUCKET}" 2>&1 | tr '\r' '\n'
 
 # Step 3: Evaluate with lm_eval
 echo "[gpu_startup] Running: evaluate_model"
 $DOCKER_RUN /opt/venv-quant/bin/python3 scripts/evaluate_model.py \
   --config /tmp/quantserve/model_config.yaml \
   --quant-bucket "${QUANT_BUCKET}" \
-  --eval-bucket "${EVAL_BUCKET}"
+  --eval-bucket "${EVAL_BUCKET}" 2>&1 | tr '\r' '\n'
 
 # Step 4: Benchmark with GuideLLM
 echo "[gpu_startup] Running: benchmark_model"
 $DOCKER_RUN /opt/venv-serve/bin/python3 scripts/benchmark_model.py \
   --config /tmp/quantserve/model_config.yaml \
   --quant-bucket "${QUANT_BUCKET}" \
-  --eval-bucket "${EVAL_BUCKET}"
+  --eval-bucket "${EVAL_BUCKET}" 2>&1 | tr '\r' '\n'
 
 # Step 5: Update model registry
 echo "[gpu_startup] Running: update_registry"
 $DOCKER_RUN /opt/venv-quant/bin/python3 scripts/update_registry.py \
   --config /tmp/quantserve/model_config.yaml \
   --eval-bucket "${EVAL_BUCKET}" \
-  --registry-bucket "${REG_BUCKET}"
+  --registry-bucket "${REG_BUCKET}" 2>&1 | tr '\r' '\n'
 
 # ---------- Signal success ----------
 echo "SUCCESS" | gcloud storage cp - "${COMPLETION_FLAG}"
