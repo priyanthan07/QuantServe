@@ -53,6 +53,9 @@ echo "[quantserve] Starting vLLM container for $${MODEL_ID}"
 exec docker run --rm --gpus all \
   -v "$${LOCAL_MODEL_DIR}":"$${LOCAL_MODEL_DIR}" \
   -e VLLM_API_KEY="$${VLLM_API_KEY}" \
+  -e LMCACHE_CHUNK_SIZE=256 \
+  -e LMCACHE_LOCAL_CPU=True \
+  -e LMCACHE_MAX_LOCAL_CPU_SIZE=5.0 \
   -p 8000:8000 \
   "$${SERVING_IMAGE}:latest" \
     --model "$${LOCAL_MODEL_DIR}" \
@@ -62,6 +65,6 @@ exec docker run --rm --gpus all \
     --dtype auto \
     --trust-remote-code \
     --api-key "$${VLLM_API_KEY}" \
-    # --kv-transfer-config '{"kv_connector":"LMCacheConnectorV1","kv_role":"kv_both","kv_connector_extra_config":{"lmcache.chunk_size":256,"lmcache.max_local_cpu_size":5}}' \
+    --kv-transfer-config '{"kv_connector":"LMCacheConnectorV1","kv_role":"kv_both"}' \
     $${VLLM_EXTRA_ARGS}
   
