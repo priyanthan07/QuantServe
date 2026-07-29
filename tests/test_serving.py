@@ -134,7 +134,7 @@ def test_structured_output(client: OpenAI, model: str) -> bool:
                 {"role": "system", "content": "You are a helpful assistant that ONLY responds in valid JSON. No markdown, no explanation, just raw JSON."},
                 {"role": "user", "content": 'Return a JSON object with exactly these keys: "name" (a random city name), "population" (a number), "country" (country name). Nothing else.'},
             ],
-            max_tokens=800,
+            max_tokens=4000,
             temperature=0.0,
         )
         content = resp.choices[0].message.content.strip()
