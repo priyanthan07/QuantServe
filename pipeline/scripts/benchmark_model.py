@@ -29,7 +29,7 @@ def start_vllm_server(model_path: str, extra_args: str) -> subprocess.Popen:
 
     # Wait for health check to pass
     import urllib.request
-    max_wait = 300  # 5 minutes
+    max_wait = 600  # 10 minutes
     start_time = time.time()
     while time.time() - start_time < max_wait:
         try:

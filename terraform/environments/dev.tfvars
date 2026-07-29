@@ -13,7 +13,15 @@ models = {
   "qwen3-8b-w4a16" = {
     gpu_type          = "nvidia-l4"
     machine_type      = "g2-standard-4"
-    min_replicas      = 1
+    min_replicas      = 0
+    max_replicas      = 1
+    disk_size_gb      = 100
+    vllm_args         = "--max-model-len 4096 --enable-prefix-caching"
+  }
+  "mistral-7b-w4a16" = {
+    gpu_type          = "nvidia-l4"
+    machine_type      = "g2-standard-4"
+    min_replicas      = 0
     max_replicas      = 1
     disk_size_gb      = 100
     vllm_args         = "--max-model-len 4096 --enable-prefix-caching"
