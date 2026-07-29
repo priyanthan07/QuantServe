@@ -20,6 +20,11 @@ steps:
       - |
         apt-get update -q && apt-get install -y -q git
         pip install pyyaml -q
+
+        # Cloud Build does a shallow single-commit fetch, so HEAD~1 doesn't exist.
+        # Deepen by 1 to make the parent commit available for diffing.
+        git fetch --deepen=1 2>/dev/null || true
+
         python3 - << 'EOF'
         # Find only the config changed in this commit
         import subprocess, sys, yaml
