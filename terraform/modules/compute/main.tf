@@ -102,7 +102,7 @@ resource "google_compute_instance_group_manager" "serving" {
 
   auto_healing_policies {
     health_check      = google_compute_health_check.vllm.id
-    initial_delay_sec = 600 # 10 min grace period for model loading
+    initial_delay_sec = 1200 # 20 min grace period for model loading
   }
 }
 

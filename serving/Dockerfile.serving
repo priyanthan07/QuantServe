@@ -3,6 +3,7 @@ FROM lmcache/vllm-openai:v0.5.1-cu129
 
 # # LMCache for cross-replica KV cache sharing
 # RUN pip install lmcache==0.5.0 --no-cache-dir
+ENV LD_LIBRARY_PATH="/opt/venv/lib/python3.12/site-packages/nvidia/cu13/lib:${LD_LIBRARY_PATH}"
 
 # Google Cloud SDK for fetching model from GCS and secrets
 RUN apt-get update && \
