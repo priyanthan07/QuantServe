@@ -1,6 +1,6 @@
 """
 QuantServe — Serving Integration Tests
-Tests the deployed Qwen3-8B-W4A16 model through the OpenAI-compatible API.
+Tests a deployed model through the OpenAI-compatible API.
 
 Usage:
     1. Copy tests/.env.example to tests/.env and fill in your values
@@ -56,13 +56,13 @@ def check(condition: bool, description: str, detail: str = ""):
 
 # ── Test 1: Health Check ─────────────────────────────────
 
-def test_health(client: OpenAI) -> bool:
+def test_health(client: OpenAI, model: str) -> bool:
     header("Health Check & Model List")
     try:
         models = client.models.list()
         model_ids = [m.id for m in models.data]
         ok = check(len(model_ids) > 0, "Server responds to /models", f"Models: {model_ids}")
-        ok &= check("qwen3-8b-w4a16" in model_ids, "Model 'qwen3-8b-w4a16' is listed")
+        ok &= check(model in model_ids, f"Model '{model}' is listed")
         return ok
     except Exception as e:
         check(False, "Server reachable", str(e))
@@ -373,7 +373,7 @@ def test_code_generation(client: OpenAI, model: str) -> bool:
 # ── Test 12: Reasoning / Chain of Thought ────────────────
 
 def test_reasoning(client: OpenAI, model: str) -> bool:
-    header("Reasoning (Qwen3 Think Mode)")
+    header("Reasoning (Chain of Thought)")
     try:
         resp = client.chat.completions.create(
             model=model,
@@ -388,7 +388,10 @@ def test_reasoning(client: OpenAI, model: str) -> bool:
         has_answer = "60" in content
 
         ok = check(len(content) > 50, "Detailed response generated", f"{len(content)} chars")
-        ok &= check(has_think, "Uses <think> reasoning mode (Qwen3 feature)")
+        if has_think:
+            check(True, "Uses <think> reasoning mode (model feature)")
+        else:
+            check(True, "Model uses inline reasoning (no <think> tags)")
         ok &= check(has_answer, "Correct answer (60 km/h)", content[-150:])
         return ok
     except Exception as e:
@@ -398,12 +401,12 @@ def test_reasoning(client: OpenAI, model: str) -> bool:
 
 # ── Test 13: Error Handling — Wrong API Key ──────────────
 
-def test_auth_error(base_url: str) -> bool:
+def test_auth_error(base_url: str, model: str) -> bool:
     header("Authentication — Wrong API Key")
     try:
         bad_client = OpenAI(base_url=base_url, api_key="wrong-key-12345")
         resp = bad_client.chat.completions.create(
-            model="qwen3-8b-w4a16",
+            model=model,
             messages=[{"role": "user", "content": "Hello"}],
             max_tokens=10,
         )
@@ -438,7 +441,7 @@ def main():
     client = OpenAI(base_url=base_url, api_key=api_key)
 
     tests = [
-        ("1",  "Health Check",         lambda: test_health(client)),
+        ("1",  "Health Check",         lambda: test_health(client, model)),
         ("2",  "Basic Generation",     lambda: test_basic_generation(client, model)),
         ("3",  "System Prompt",        lambda: test_system_prompt(client, model)),
         ("4",  "Structured JSON",      lambda: test_structured_output(client, model)),
@@ -450,7 +453,7 @@ def main():
         ("10", "Throughput Benchmark", lambda: test_throughput(client, model)),
         ("11", "Code Generation",      lambda: test_code_generation(client, model)),
         ("12", "Reasoning (Think)",    lambda: test_reasoning(client, model)),
-        ("13", "Auth Error Handling",  lambda: test_auth_error(base_url)),
+        ("13", "Auth Error Handling",  lambda: test_auth_error(base_url, model)),
     ]
 
     print("=" * 60)
@@ -496,3 +499,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+    
