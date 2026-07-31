@@ -47,6 +47,11 @@ cleanup() {
 }
 trap cleanup EXIT
 
+# Disable unattended upgrades — apt-daily-upgrade causes systemd re-exec which
+# restarts nvidia-persistenced and kills the CUDA context mid-quantization.
+systemctl stop apt-daily-upgrade.timer apt-daily.timer unattended-upgrades.service 2>/dev/null || true
+systemctl mask apt-daily-upgrade.service apt-daily.service 2>/dev/null || true
+
 # ---------- Install Docker + NVIDIA Container Toolkit ----------
 # The DLVM image ships with NVIDIA GPU drivers and CUDA pre-installed,
 # but does NOT include Docker. We need two things:
