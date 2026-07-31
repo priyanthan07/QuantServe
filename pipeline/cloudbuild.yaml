@@ -165,7 +165,7 @@ steps:
         COMPLETE_FLAG="gs://${_EVAL_BUCKET}/_pipeline_flags/${BUILD_ID}/COMPLETE"
         FAILURE_FLAG="gs://${_EVAL_BUCKET}/_pipeline_flags/${BUILD_ID}/FAILED"
         echo "Waiting for GPU pipeline (build ${BUILD_ID})..."
-        for i in $(seq 1 200); do
+        for i in $(seq 1 500); do
           sleep 30
           if gcloud storage ls "$${COMPLETE_FLAG}" 2>/dev/null; then
             echo "GPU pipeline complete."
@@ -175,7 +175,7 @@ steps:
             echo "GPU pipeline FAILED."
             exit 1
           fi
-          echo "  Still waiting... ($${i}/120)"
+          echo "  Still waiting... ($${i}/500)"
         done
         echo "Timeout waiting for GPU pipeline."
         exit 1
