@@ -7,7 +7,7 @@ locals {
     templatefile("${path.module}/../../../serving/startup.sh", {
     quantized_models_bucket = var.quantized_models_bucket
     model_registry_bucket   = var.model_registry_bucket
-    model_id                = var.model_id
+    model_id                = replace(replace(var.model_id, ".", "-"), ".", "-")
     vllm_args               = var.vllm_args
     project_id              = var.project_id
     serving_image_url       = var.serving_image_url
@@ -19,7 +19,7 @@ locals {
 # ---------- Instance Template ----------
 
 resource "google_compute_instance_template" "serving" {
-  name_prefix  = "quantserve-${var.model_id}-${var.environment}-"
+  name_prefix  = "quantserve-${replace(replace(var.model_id, ".", "-"), ".", "-")}-${var.environment}-"
   project      = var.project_id
   machine_type = var.machine_type
   region       = var.region
@@ -57,7 +57,7 @@ resource "google_compute_instance_template" "serving" {
 
   metadata = {
     startup-script = local.startup_script
-    model_id       = var.model_id
+    model_id       = replace(replace(var.model_id, ".", "-"), ".", "-")
   }
 
   lifecycle {
@@ -68,7 +68,7 @@ resource "google_compute_instance_template" "serving" {
 # ---------- Health Check ----------
 
 resource "google_compute_health_check" "vllm" {
-  name    = "quantserve-${var.model_id}-health-${var.environment}"
+  name    = "quantserve-${replace(var.model_id, ".", "-")}-health-${var.environment}"
   project = var.project_id
 
   check_interval_sec  = 10
@@ -85,11 +85,11 @@ resource "google_compute_health_check" "vllm" {
 # ---------- Managed Instance Group ----------
 
 resource "google_compute_instance_group_manager" "serving" {
-  name    = "quantserve-${var.model_id}-mig-${var.environment}"
+  name    = "quantserve-${replace(var.model_id, ".", "-")}-mig-${var.environment}"
   project = var.project_id
   zone    = var.zone
 
-  base_instance_name = "quantserve-${var.model_id}"
+  base_instance_name = "quantserve-${replace(var.model_id, ".", "-")}"
 
   version {
     instance_template = google_compute_instance_template.serving.self_link
@@ -109,7 +109,7 @@ resource "google_compute_instance_group_manager" "serving" {
 # ---------- Autoscaler ----------
 
 resource "google_compute_autoscaler" "serving" {
-  name    = "quantserve-${var.model_id}-autoscaler-${var.environment}"
+  name    = "quantserve-${replace(var.model_id, ".", "-")}-autoscaler-${var.environment}"
   project = var.project_id
   zone    = var.zone
   target  = google_compute_instance_group_manager.serving.id

@@ -21,7 +21,7 @@ resource "google_compute_managed_ssl_certificate" "api" {
 resource "google_compute_backend_service" "models" {
   for_each = var.model_backends
 
-  name        = "quantserve-${each.key}-backend-${var.environment}"
+  name        = "quantserve-${replace(each.key, ".", "-")}-backend-${var.environment}"
   project     = var.project_id
   protocol    = "HTTP"
   port_name   = "vllm"
