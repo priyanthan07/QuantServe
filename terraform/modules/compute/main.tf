@@ -7,7 +7,7 @@ locals {
     templatefile("${path.module}/../../../serving/startup.sh", {
     quantized_models_bucket = var.quantized_models_bucket
     model_registry_bucket   = var.model_registry_bucket
-    model_id                = replace(replace(var.model_id, ".", "-"), ".", "-")
+    model_id                = var.model_id
     vllm_args               = var.vllm_args
     project_id              = var.project_id
     serving_image_url       = var.serving_image_url
@@ -57,7 +57,7 @@ resource "google_compute_instance_template" "serving" {
 
   metadata = {
     startup-script = local.startup_script
-    model_id       = replace(replace(var.model_id, ".", "-"), ".", "-")
+    model_id       = var.model_id
   }
 
   lifecycle {
