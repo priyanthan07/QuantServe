@@ -15,6 +15,12 @@ variable "zone" {
   default     = "us-central1-a"
 }
 
+variable "zones" {
+  description = "Zones for serving MIG distribution policy. GCP picks whichever has GPU capacity."
+  type        = list(string)
+  default     = ["us-central1-a", "us-central1-b", "us-central1-c"]
+}
+
 variable "environment" {
   description = "Environment name (dev, staging, prod)"
   type        = string

@@ -51,7 +51,15 @@ scrape_configs:
   - job_name: 'vllm'
     gce_sd_configs:
       - project: ${var.project_id}
-        zone: ${var.zone}
+        zone: us-central1-a
+        port: 8000
+        refresh_interval: 30s
+      - project: ${var.project_id}
+        zone: us-central1-b
+        port: 8000
+        refresh_interval: 30s
+      - project: ${var.project_id}
+        zone: us-central1-c
         port: 8000
         refresh_interval: 30s
     relabel_configs:

@@ -84,10 +84,13 @@ resource "google_compute_health_check" "vllm" {
 
 # ---------- Managed Instance Group ----------
 
-resource "google_compute_instance_group_manager" "serving" {
+resource "google_compute_region_instance_group_manager" "serving" {
   name    = "quantserve-${replace(var.model_id, ".", "-")}-mig-${var.environment}"
   project = var.project_id
-  zone    = var.zone
+  region  = var.region
+
+  distribution_policy_zones        = var.zones
+  distribution_policy_target_shape = "ANY_SINGLE_ZONE"
 
   base_instance_name = "quantserve-${replace(var.model_id, ".", "-")}"
 
@@ -104,15 +107,23 @@ resource "google_compute_instance_group_manager" "serving" {
     health_check      = google_compute_health_check.vllm.id
     initial_delay_sec = 1200 # 20 min grace period for model loading
   }
+
+  update_policy {
+    type                         = "PROACTIVE"
+    minimal_action               = "REPLACE"
+    instance_redistribution_type = "NONE"
+    max_surge_fixed              = 3
+    max_unavailable_fixed        = 3
+  }
 }
 
 # ---------- Autoscaler ----------
 
-resource "google_compute_autoscaler" "serving" {
+resource "google_compute_region_autoscaler" "serving" {
   name    = "quantserve-${replace(var.model_id, ".", "-")}-autoscaler-${var.environment}"
   project = var.project_id
-  zone    = var.zone
-  target  = google_compute_instance_group_manager.serving.id
+  region  = var.region
+  target  = google_compute_region_instance_group_manager.serving.id
 
   autoscaling_policy {
     min_replicas    = var.min_replicas

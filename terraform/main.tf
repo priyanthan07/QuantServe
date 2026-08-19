@@ -79,7 +79,7 @@ module "compute" {
 
   project_id  = var.project_id
   region      = var.region
-  zone        = var.zone
+  zones       = var.zones
   environment = var.environment
 
   model_id          = each.key

@@ -1,6 +1,6 @@
 project_id  = "dev-46599"
 region      = "us-central1"
-zone        = "us-central1-a"
+zones       = ["us-central1-a", "us-central1-b", "us-central1-c"]
 environment = "dev"
 domain_suffix = "dev-quantserve.com"
 dns_zone_name = "dev-quantserve-com"
@@ -13,7 +13,7 @@ models = {
   "qwen3-8b-w4a16" = {
     gpu_type          = "nvidia-l4"
     machine_type      = "g2-standard-4"
-    min_replicas      = 0
+    min_replicas      = 1
     max_replicas      = 1
     disk_size_gb      = 100
     vllm_args         = "--max-model-len 4096 --enable-prefix-caching"

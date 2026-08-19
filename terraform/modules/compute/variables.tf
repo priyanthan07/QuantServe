@@ -6,8 +6,9 @@ variable "region" {
   type = string
 }
 
-variable "zone" {
-  type = string
+variable "zones" {
+  description = "Zones for the regional MIG distribution policy"
+  type        = list(string)
 }
 
 variable "environment" {
