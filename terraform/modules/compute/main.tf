@@ -90,7 +90,7 @@ resource "google_compute_region_instance_group_manager" "serving" {
   region  = var.region
 
   distribution_policy_zones        = var.zones
-  distribution_policy_target_shape = "ANY_SINGLE_ZONE"
+  distribution_policy_target_shape = "ANY"
 
   base_instance_name = "quantserve-${replace(var.model_id, ".", "-")}"
 
@@ -106,6 +106,11 @@ resource "google_compute_region_instance_group_manager" "serving" {
   auto_healing_policies {
     health_check      = google_compute_health_check.vllm.id
     initial_delay_sec = 1200 # 20 min grace period for model loading
+  }
+
+  instance_lifecycle_policy {
+    default_action_on_failure = "REPAIR"
+    force_update_on_repair    = "YES"
   }
 
   update_policy {
